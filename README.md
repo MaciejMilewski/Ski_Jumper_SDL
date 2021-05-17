@@ -1,1 +1,1 @@
-# Ski_Jumper_SDL
+# Ski Jumper game in SDL2
