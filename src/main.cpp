@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) ////// Początek i podłączenie kolejnych bibl
             return 4;
         }
 
-        Global::renderer = SDL_CreateRenderer(Global::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        Global::renderer = SDL_CreateRenderer(Global::window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
         
         if (Global::renderer == NULL) {
             SDL_GetError();
@@ -77,7 +77,9 @@ int main(int argc, char* argv[]) ////// Początek i podłączenie kolejnych bibl
 
         while (Global::status != Status::EXIT)
         {
+            SDL_SetRenderDrawColor(Global::renderer, 0, 0, 0, 0);
             SDL_RenderClear(Global::renderer);
+
             while (SDL_PollEvent(&Global::input) > 0)
             {
                 if (Global::input.type == SDL_QUIT) Global::status = Status::EXIT;
