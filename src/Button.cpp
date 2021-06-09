@@ -6,10 +6,10 @@ Button::Button(const char* normalImagePath, const char* selectedImagePath,
     unsigned int width, unsigned int height,
     unsigned int posX, unsigned int posY, SDL_Renderer& render)
 {
-    this->width = width;
+    this->width  = width;
     this->height = height;
-    this->posX = posX;
-    this->posY = posY;
+    this->posX   = posX;
+    this->posY   = posY;
     this->render = &render;
     this->imagePath = normalImagePath;
     this->selectedImagePath = selectedImagePath;
@@ -17,7 +17,7 @@ Button::Button(const char* normalImagePath, const char* selectedImagePath,
     loaded_surface = IMG_Load(selectedImagePath);
     selectedImage = SDL_CreateTextureFromSurface(&render, loaded_surface);
     if (!selectedImage)
-        std::cout << " Nie stworzono 'surface' z pliku" << selectedImagePath << ", " << SDL_GetError() << '\n';
+        std::cout << " Nie stworzono 'surface' z pliku " << selectedImagePath << ", " << SDL_GetError() << '\n';
     SDL_FreeSurface(loaded_surface);
 
     loaded_surface = IMG_Load(normalImagePath);
@@ -45,14 +45,23 @@ int Button::GetY()
 
 enum tryb Button::Clicked(SDL_Event& e)
 {
-    SDL_GetMouseState(&mouse_XY.x, &mouse_XY.y);     // odczytuje pozycj� myszki 
+    SDL_GetMouseState(&mouse_XY.x, &mouse_XY.y);     
 
     mode = (mouse_XY.x >= posX && mouse_XY.x <= posX + width && mouse_XY.y >= posY && mouse_XY.y <= posY + height) ?
         tryb::pressed : tryb::normal;
 
-    if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP)
-    {
-        if (mode == tryb::pressed)  mode = tryb::selected;
+    bool mousedown = 0;
+
+    if (e.type == SDL_MOUSEBUTTONDOWN)
+        mousedown = 1;
+
+    SDL_Delay(30);
+
+    if (mousedown || e.type == SDL_MOUSEBUTTONUP)
+    {        
+        if (mode == tryb::pressed)  mode = tryb::selected;        
+        SDL_Delay(50);
+        mousedown = 0;
     }
     return mode;
 }
