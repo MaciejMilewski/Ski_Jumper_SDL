@@ -1,16 +1,16 @@
 #include "CheckBox.h"
 
-
 CheckBox::~CheckBox()
 {
     SDL_DestroyTexture(normalImage);
+        normalImage = nullptr;
     SDL_DestroyTexture(selectedImage);
+        selectedImage = nullptr;
 }
 
 CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
     const char* label, const char* fontName,
-    unsigned int fontSize, unsigned int width, unsigned int height,
-    unsigned int posX, unsigned int posY, SDL_Renderer& render)
+    int fontSize, int width, int height, int posX, int posY, SDL_Renderer& render)
 {
     this->width = width;
     this->height = height;
@@ -42,7 +42,7 @@ CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
         }
         else
         {
-            SDL_Surface* textSurface = TTF_RenderText_Solid(pFont, label, textColor);
+            SDL_Surface* textSurface = TTF_RenderText_Blended(pFont, label, textColor);
             if (!textSurface) {
                 std::cout << " Nie stworzono 'surface' z pliku .ttf : " << TTF_GetError() << '\n';
             }
@@ -54,11 +54,11 @@ CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
                 }
                 else
                 {
-                    width = textSurface->w; // zapisz rozmiar stworzonego obrazka
+                    width = textSurface ->w; // zapisz rozmiar stworzonego obrazka
                     height = textSurface->h;
                     TTF_CloseFont(pFont);
                 }
-              SDL_FreeSurface(textSurface);
+                SDL_FreeSurface(textSurface);
             }
         }
     }
@@ -70,11 +70,11 @@ tryby CheckBox::Clicked(SDL_Event& e)
 
     int posXcheck = posX + width + 10;
 
-    bool InOut = (mouse_XY.x >= posXcheck && mouse_XY.x <= posXcheck + height && mouse_XY.y >= posY && mouse_XY.y <= posY + height) ? 1 : 0;
+    bool InOut = ((mouse_XY.x >= posXcheck) && (mouse_XY.x <= (posXcheck + height)) && (mouse_XY.y >= posY) && (mouse_XY.y <= (posY + height))) ? 1 : 0;
 
     if (InOut && e.type == SDL_MOUSEBUTTONUP)
-    {       
-        (mode == tryby::selected) ? mode = tryby::normal : mode = tryby::selected;       
+    {
+        (mode == tryby::selected) ? mode = tryby::normal : mode = tryby::selected;
     }
     return mode;
 }
@@ -90,7 +90,7 @@ void CheckBox::ShowButton()
             SDL_SetRenderDrawColor(render, 0, 123, 0, 255);
             SDL_RenderDrawRect(render, &dest);
             SDL_RenderCopy(render, mTekst, NULL, &dest);
-        }       
+        }
         SDL_RenderCopy(render, normalImage, NULL, &check);
         break;
     case tryby::selected:
@@ -98,7 +98,7 @@ void CheckBox::ShowButton()
             SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
             SDL_RenderDrawRect(render, &dest);
             SDL_RenderCopy(render, mTekst, NULL, &dest);
-        }        
+        }
         SDL_RenderCopy(render, selectedImage, NULL, &check);
         break;
     }

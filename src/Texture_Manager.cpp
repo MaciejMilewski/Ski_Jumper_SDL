@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "Texture_Manager.h"
 
 TextureManager* TextureManager::pInstance = nullptr;
@@ -7,24 +8,25 @@ bool TextureManager::Load(std::string fileName, std::string id, SDL_Renderer* re
 {
     SDL_Surface* tempSurf = IMG_Load(fileName.c_str());
 
-    if (!tempSurf) {
-        std::cout << "  ! Nie wczytuje pliku : " << fileName.c_str() << '\n';
+    if (!tempSurf) 
+    {
+        std::cerr << "  ! Nie wczytuje pliku : " << fileName.c_str() << '\n';
         return false;
-    } 
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tempSurf);
+    }
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, tempSurf);
 
-        SDL_FreeSurface(tempSurf);
-   
-        if (!texture) {
-            std::cout << " ! Nie tworzy textury z surface : " << fileName.c_str() << '\n';
-            return false;
-        } 
-     
-     std::cout << " Textura wczytana : " << fileName.c_str() << '\n';
+    SDL_FreeSurface(tempSurf);
 
-     textureMap[id] = texture;
-   
-  return true;   
+    if (!texture) {
+        std::cerr << " ! Nie tworzy textury z surface : " << fileName.c_str() << '\n';
+        return false;
+    }
+
+    std::cout << " Textura wczytana : " << fileName.c_str() << '\n';
+
+    textureMap[id] = texture;
+
+    return true;
 }
 
 void TextureManager::Draw(std::string id, int x, int y, int w, int h, float scale, int rotation,

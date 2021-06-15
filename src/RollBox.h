@@ -19,21 +19,24 @@ class RollBox
 {
 public:
     RollBox(std::string tab[],
-            unsigned int width, unsigned int height,
-            unsigned int posX,  unsigned int posY, int size, SDL_Renderer* render);
+        unsigned int width, unsigned int height,
+        unsigned int posX, unsigned int posY, int size, SDL_Renderer* render);
 
     virtual~RollBox();
-    // TextureManager* p = TextureManager::Instance();
+
     void Show();
+
     void Clicked(SDL_Event& e);
+    int get_Selected();
 
 private:
-    SDL_Renderer* render = NULL;   
-    SDL_Texture* texture = NULL;   
+    SDL_Renderer* render = NULL;
+    SDL_Texture* texture = NULL;
 
-    SDL_Point mouse_XY  { 0,0 };
+    SDL_Point mouse_XY{ 0,0 };
 
-    std::string *t = nullptr;
+    std::string* t = nullptr;
 
-    int width = 0 , height = 0, posX = 0, posY = 0, sizeTab = 0, nr_Pict = 0;
+    int width = 0, height = 0, posX = 0, posY = 0, sizeTab = 0, nr_Pict = 0;
 };
+

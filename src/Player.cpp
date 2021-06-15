@@ -8,7 +8,7 @@ void Player::set_Weight(double weight)
 {
 	m_weight = weight;
 }
-void Player::set_Mapa(int mapa)
+void Player::set_Maps(int mapa)
 {
 	m_mapa = mapa;
 }
@@ -16,7 +16,7 @@ void Player::set_Weather(int weather)
 {
 	m_weather = weather;
 }
-void Player::set_Wind(double wind)
+void Player::set_Wind(int wind)
 {
 	m_wind = wind;
 }
@@ -28,7 +28,7 @@ double Player::get_Weight() const
 {
 	return m_weight;
 }
-int Player::get_Mapa() const
+int Player::get_Maps() const
 {
 	return m_mapa;
 }
@@ -36,7 +36,7 @@ int Player::get_Weather() const
 {
 	return m_weather;
 }
-double Player::get_Wind() const
+int Player::get_Wind() const
 {
 	return m_wind;
 }

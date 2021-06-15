@@ -5,7 +5,7 @@
 # Compiler settings - Can be customized.
 CC = g++
 CXXFLAGS = -std=c++11 -Wall -g
-LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lGL -lGLEW
+LDFLAGS = -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lGL -lGLEW
 
 # Makefile settings - Can be customized.
 APPNAME = SkiJumper

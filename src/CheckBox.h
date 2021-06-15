@@ -4,20 +4,19 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
- enum class tryby { normal, pressed, selected };
+enum class tryby { normal, pressed, selected };
 
- class CheckBox
+class CheckBox
 {
 public:
     CheckBox(const char* normalImagePath, const char* selectedImagePath, const char* label, const char* fontName,
-        unsigned int fontSize, unsigned int width, unsigned int height,
-        unsigned int posX, unsigned int posY, SDL_Renderer& render);
+        int fontSize, int width, int height, int posX, int posY, SDL_Renderer& render);
 
-    virtual~CheckBox();   
-    
+    virtual~CheckBox();
+
     void ShowButton();
     void set_Mode(tryby t);
-   tryby Clicked(SDL_Event& e);
+    tryby Clicked(SDL_Event& e);
 
 private:
     SDL_Renderer* render = NULL;

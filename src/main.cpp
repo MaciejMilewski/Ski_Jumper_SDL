@@ -1,62 +1,68 @@
-﻿#include <iostream>
-
+#include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "Texture_Manager.h"
 #include "Button.h"
 #include "CheckBox.h"
-#include "Player.h"
 #include "RollBox.h"
-
+#include "Player.h"
+#include "Physics.h"
+#include "Jump.h"
 
 enum class Status { MENU, START, SCORE, INFO, CONFIG, EXIT };
 
-namespace Global 
+namespace Global
 {
     const int  SCREEN_WIDTH = 800;
     const int SCREEN_HEIGHT = 600;
+    const int   NAME_LENGTH = 8;
 
-    SDL_Window* window      = NULL;
-    SDL_Renderer* renderer  = NULL;
-    
-    SDL_Event input;
+    SDL_Window* window      = nullptr;
+    SDL_Renderer* renderer  = nullptr;
 
-    Player player;
+    SDL_Event input;  
 
-    Status status = Status::MENU;  
-   
+    Status status = Status::MENU;
+
+    Player* player = new Player;
+
+    Physics* physics = new Physics;
+
     const int FPS = 24;
     const int frameDelay = 1000 / FPS;
     Uint32    frameStart;
     int       frameTime;
 }
+    void Loading_Resourses();
+    void Release_Resourses();
+    void Splash();
 
-void Loading_Resourses();
-void Release_Resourses();
+    Status Menu();
+    Status Start();
+    Status Scoreboard();
+    Status Info();
+    Status Config();
 
-void Splash();
+    Uint32 Callback(Uint32 interval, void* param);
+      void Null();
 
-Status Menu();
-Status Start();
-Status Scoreboard();
-Status Info();
-Status Config();
-
-std::string InputTextBox(int lengthText, int highText, int xPos, int yPos);
-
-int main(int argc, char* argv[]) ////// Początek i podłączenie kolejnych bibliotek /////
+int main(int argc, char* argv[])    // Beginning program
 {
-    try {        
-       
+    srand(static_cast <unsigned int> (time(0)));
+    
+    try {
+
         if (SDL_Init(SDL_INIT_EVERYTHING)) {
             throw SDL_GetError();
             return 1;
         }
 
-        if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {	                    // Ustawia filtrowanie textury na 'linear' - b.dobra jakość        
-            throw " Uwaga: filtrowanie 'linear' textur nie jest ustawione ! \n";
+        if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+        {	             
+            throw " filtrowanie 'linear' textur nie jest ustawione ! \n";
         }
 
         if (!IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
@@ -77,26 +83,31 @@ int main(int argc, char* argv[]) ////// Początek i podłączenie kolejnych bibl
             return 4;
         }
 
-        Global::renderer = SDL_CreateRenderer(Global::window, -1,  SDL_RENDERER_PRESENTVSYNC|SDL_RENDERER_ACCELERATED);
-        
+        Global::renderer = SDL_CreateRenderer(Global::window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+
         if (Global::renderer == NULL) {
-            SDL_GetError();
+            throw SDL_GetError();
             return 5;
         }
-                
-        Loading_Resourses();        
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+        {            
+          throw " brak aktywnego systemu AUDIO ...";
+        }
 
-        Splash();       
-        
-        // ------------------------------------ MAIN LOOP ---------------------------------------------------- //
+        Loading_Resourses();
+
+        Splash();
+
+        // ------------------------ MAIN LOOP ----------------------- //
 
         bool mousedown = 0;
 
         while (Global::status != Status::EXIT)
-        {              
+        {
             while (SDL_PollEvent(&Global::input) > 0)
             {
-                switch (Global::input.type) {
+                switch (Global::input.type)
+                {
                 case SDL_QUIT: Global::status = Status::EXIT;
                     break;
                 case SDL_MOUSEBUTTONDOWN:
@@ -104,41 +115,41 @@ int main(int argc, char* argv[]) ////// Początek i podłączenie kolejnych bibl
                     break;
                 case SDL_MOUSEBUTTONUP:
                     if (mousedown) {
-                        /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                           previous SDL_MOUSEBUTTONDOWN event has not occurred. */                        
+                        
                     }
                     mousedown = 0;
                     break;
                 }
-            }      
-            
+            }
+
             switch (Global::status)
             {
-                case Status::MENU      : Menu();       break;   //  Wywołanie procedur odpowiednio do wykonywanej funkcji
-                case Status::START     : Start();      break;   //  każda procedura zwraca status:: który kieruje wywołania 
-                case Status::SCORE     : Scoreboard(); break;   //  do kolejnych procedur lub klass, ustawienie zmiennej
-                case Status::INFO      : Info();       break;   // 'Global::Status = Status::Exit;' kończy program ... .
-                case Status::CONFIG    : Config();     break;               
-            }            
-        }        
+            case Status::MENU:   Menu();       break;   
+            case Status::START:  Start();      break;   
+            case Status::SCORE:  Scoreboard(); break;   
+            case Status::INFO:   Info();       break;   
+            case Status::CONFIG: Config();     break;
+            }
+        }
 
         Release_Resourses();
-        
-    } catch (const char* msg)   // Obsługa wyjątków
-    {
-        std::cerr << " Awaria : " << msg << '\n';
+
     }
-    
-  return 0;  
+    catch (const char* msg)   
+    {
+        std::cerr << " Problem : " << msg << '\n';
+    }
+
+    return EXIT_SUCCESS;
 }
 
-// ------------------------------------------------------------------------------------------------------- //
+// -------------------- END MAIN LOOP ----------------------- //
 
 void Splash()   //  pierwszy ekran  
 {
     TextureManager::Instance()->Draw("splash", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1, 0, Global::renderer);
-   
-    SDL_Surface* app_ico = IMG_Load("img/ski_Icon.jpg");        // Ikona dla aplikacji 
+
+    SDL_Surface* app_ico = IMG_Load("img/ski_Icon.jpg");  // Ikona dla aplikacji 
 
     if (!app_ico)
     {
@@ -146,30 +157,27 @@ void Splash()   //  pierwszy ekran
     }
 
     SDL_SetWindowIcon(Global::window, app_ico);
-
     SDL_FreeSurface(app_ico);
+    SDL_RenderPresent(Global::renderer);
+    SDL_Delay(3000);
 
-    SDL_RenderPresent(Global::renderer);                        
-
-    SDL_Delay(3000);                                            
-
-    TextureManager::Instance()->clearFromTextureMap("splash");  // usuwa 'splash' z pamięci kontenera map
+    TextureManager::Instance()->clearFromTextureMap("splash");  
 }
 
-Status Menu()   // zarządza Menu Głównym
-{    
+Status Menu() // zarz�dza Menu G��wnym
+{
     TextureManager::Instance()->Draw("menu", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
-    Button* buttonInfos = new Button("img/help_button.png",  "img/helpS_button.png",  100, 52,  50, 530, *Global::renderer);
+    Button* buttonInfos = new Button("img/help_button.png", "img/helpS_button.png", 100, 52, 50, 530, *Global::renderer);
     Button* buttonStart = new Button("img/Start_button.png", "img/StartS_button.png", 100, 52, 210, 530, *Global::renderer);
     Button* buttonStore = new Button("img/score_button.png", "img/scoreS_button.png", 130, 60, 410, 530, *Global::renderer);
-    Button* buttonExits = new Button("img/Exits_button.png", "img/ExitsS_button.png", 100, 52, 610, 530, *Global::renderer);       
+    Button* buttonExits = new Button("img/Exits_button.png", "img/ExitsS_button.png", 100, 52, 610, 530, *Global::renderer);
 
     bool mousedown = 0;
 
     while (Global::status == Status::MENU)
     {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
+        Global::frameStart = SDL_GetTicks();                        
 
         while (SDL_PollEvent(&Global::input) > 0)
         {
@@ -181,14 +189,13 @@ Status Menu()   // zarządza Menu Głównym
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */                   
+                    
                 }
                 mousedown = 0;
                 break;
             }
         }
-        
+
         buttonInfos->Clicked(Global::input);
         buttonInfos->ShowButton();
         buttonStart->Clicked(Global::input);
@@ -209,13 +216,13 @@ Status Menu()   // zarządza Menu Głównym
 
         SDL_RenderPresent(Global::renderer);
 
-        Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
+        Global::frameTime = SDL_GetTicks() - Global::frameStart;   
 
-        if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
+        if (Global::frameDelay > Global::frameTime)                
         {
             SDL_Delay(Global::frameDelay - Global::frameTime);
-        }        
-    }   
+        }
+    }
 
     delete buttonInfos;
     delete buttonStart;
@@ -224,69 +231,76 @@ Status Menu()   // zarządza Menu Głównym
 
     return Global::status;
 }
-Status Start() // zarządza START - under constraction !
-{    
-    TextureManager::Instance()->Draw("start", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
-    Button* buttonMenu = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 50, 530, *Global::renderer);       
+Status Start() // Skoki !
+{
+    SDL_TimerID timerID = SDL_AddTimer(1500, Callback, (void*)Null);
+
+    Jump jump(Global::renderer, Global::physics, Global::player);
+
+    Fazy_skoku skok = Fazy_skoku::CZEKA;      
+
+    SDL_Event event;
     
-    bool mousedown = 0;
-    
-    while (Global::status == Status::START)
+    Global::status  = Status::SCORE;
+
+    while (skok != Fazy_skoku::END)
     {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
-        
-        while (SDL_PollEvent(&Global::input) > 0)
+        jump.frameStart = SDL_GetTicks();
+
+        switch (skok)
         {
-            switch (Global::input.type) {
-            case SDL_QUIT: Global::status = Status::EXIT;
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */
-                }
-                mousedown = 0;
-                break;
-            }
+        case Fazy_skoku::CZEKA:    skok = jump.Czeka();
+            break;
+        case Fazy_skoku::ZJAZD:    skok = jump.Zjazd();
+            break;
+        case Fazy_skoku::SKOK:     skok = jump.Wyskok();
+            break;
+        case Fazy_skoku::TELEMARK: skok = jump.Landing();
+            break;
+        case Fazy_skoku::END:
+            break;
         }
 
-        buttonMenu->Clicked(Global::input);
-        buttonMenu->ShowButton();
-
-        if (tryb::selected == buttonMenu->Clicked(Global::input))
-            Global::status = Status::MENU;
-
-        SDL_RenderPresent(Global::renderer);     
-        
-        Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
-
-        if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
+        while (SDL_PollEvent(&event) != 0)
         {
-            SDL_Delay(Global::frameDelay - Global::frameTime);
-        }           
-    }
+            if (event.type == SDL_QUIT) skok = Fazy_skoku::END;
+            if (event.type == SDL_KEYDOWN)
+            {
+                switch (event.key.keysym.sym)
+                {
+                case SDLK_RETURN: skok = Fazy_skoku::ZJAZD; break;               
+                }
+            }
+        }       
 
-    delete buttonMenu;
+        SDL_RenderPresent(Global::renderer);
+
+        jump.frameTime = SDL_GetTicks() - jump.frameStart;
+
+        if (jump.frameDelay > jump.frameTime)
+        {
+            SDL_Delay(jump.frameDelay - jump.frameTime);
+        }
+    }    
+
+    SDL_RemoveTimer(timerID);    
 
     return Global::status;
 }
 
-Status Scoreboard() // zarządza SCOREBOARD 
-{    
+Status Scoreboard() // pokazuje tablic� wynik�w skok�w
+{
     TextureManager::Instance()->Draw("score", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
-    Button* buttonScore = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 40, 535, *Global::renderer);     
+    Button* buttonScore = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 40, 535, *Global::renderer);
 
-    bool mousedown = 0;
+    bool mousedown = 0;    
 
     while (Global::status == Status::SCORE)
     {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
-        
+        Global::frameStart = SDL_GetTicks();                        
+
         while (SDL_PollEvent(&Global::input) > 0)
         {
             switch (Global::input.type) {
@@ -297,8 +311,7 @@ Status Scoreboard() // zarządza SCOREBOARD
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */
+                   
                 }
                 mousedown = 0;
                 break;
@@ -311,33 +324,33 @@ Status Scoreboard() // zarządza SCOREBOARD
         if (tryb::selected == buttonScore->Clicked(Global::input))
             Global::status = Status::MENU;
 
-        SDL_RenderPresent(Global::renderer);   
+        SDL_RenderPresent(Global::renderer);
 
-        Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
+        Global::frameTime = SDL_GetTicks() - Global::frameStart;      
 
-        if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
+        if (Global::frameDelay > Global::frameTime)                   
         {
             SDL_Delay(Global::frameDelay - Global::frameTime);
-        }            
+        }
     }
 
     delete buttonScore;
-    
+
     return Global::status;
 }
 
-Status Info() // zarządza ekranem INFO
+Status Info() // zarz�dza ekranem INFO
 {
     TextureManager::Instance()->Draw("info", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
-    Button* buttonInfo = new Button("img/back_button.png", "img/backS_button.png", 90, 52, 40, 540, *Global::renderer);    
-    
+    Button* buttonInfo = new Button("img/back_button.png", "img/backS_button.png", 90, 52, 40, 540, *Global::renderer);
+
     bool mousedown = 0;
 
     while (Global::status == Status::INFO)
     {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
-        
+        Global::frameStart = SDL_GetTicks();                        
+
         while (SDL_PollEvent(&Global::input) > 0)
         {
             switch (Global::input.type) {
@@ -348,8 +361,7 @@ Status Info() // zarządza ekranem INFO
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */
+                    
                 }
                 mousedown = 0;
                 break;
@@ -362,68 +374,93 @@ Status Info() // zarządza ekranem INFO
         if (tryb::selected == buttonInfo->Clicked(Global::input))
             Global::status = Status::MENU;
 
-        SDL_RenderPresent(Global::renderer);      
+        SDL_RenderPresent(Global::renderer);
 
-        Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
+        Global::frameTime = SDL_GetTicks() - Global::frameStart;      
 
-        if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
-        {
+        if (Global::frameDelay > Global::frameTime) 
+        {                 
             SDL_Delay(Global::frameDelay - Global::frameTime);
-        }         
+        }
     }
 
     delete buttonInfo;
 
     return Global::status;
 }
+
 Status Config()
 {
     TextureManager::Instance()->Draw("config", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
+    TextureManager::Instance()->Draw("inputBox", 235, 304, 158, 55, 1.0, 0, Global::renderer);
 
-    Button* buttonBack = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 250, 540, *Global::renderer);
+    Button* buttonBack  = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 250, 540, *Global::renderer);
     Button* buttonStart = new Button("img/Start_button.png", "img/StartS_button.png", 100, 52, 410, 540, *Global::renderer);
 
-    CheckBox* chb_Small = new CheckBox("img/s_button.png", "img/sS_button.png", " ", "img/arial.ttf", 36, 0, 40, 224, 366, *Global::renderer);
+    CheckBox* chb_Small  = new CheckBox("img/s_button.png", "img/sS_button.png", " ", "img/arial.ttf", 36, 0, 40, 224, 366, *Global::renderer);
     CheckBox* chb_Medium = new CheckBox("img/m_button.png", "img/mS_button.png", " ", "img/arial.ttf", 36, 0, 40, 278, 366, *Global::renderer);
-    CheckBox* chb_Large = new CheckBox("img/L_button.png", "img/LS_button.png", " ", "img/arial.ttf", 36, 0, 42, 337, 366, *Global::renderer);
-    CheckBox* chb_WindF = new CheckBox("img/Stable_button.png", "img/FickleS_button.png", "", "img/arial.ttf", 36, 0, 52, 526, 303, *Global::renderer);
-    
+    CheckBox* chb_Large  = new CheckBox("img/L_button.png", "img/LS_button.png", " ", "img/arial.ttf", 36, 0, 42, 337, 366, *Global::renderer);
+    CheckBox* chb_WindF  = new CheckBox("img/Stable_button.png", "img/FickleS_button.png", "", "img/arial.ttf", 36, 0, 52, 526, 303, *Global::renderer);
+
     std::string Mapy[3]    = { "skocznia-1", "skocznia-2", "skocznia-3" };
     std::string Weather[4] = { "rain", "sun",  "snow", "wind" };
 
-    RollBox* roll_Maps    = new RollBox(Mapy   , 120, 80, 240, 420, 2, Global::renderer);
+    RollBox* roll_Maps = new RollBox(Mapy, 120, 80, 240, 420, 2, Global::renderer);
     RollBox* roll_Weather = new RollBox(Weather, 120, 80, 535, 365, 3, Global::renderer);
 
     int check_weight = 1;
 
     chb_Small->set_Mode(tryby::selected);
 
-    Global::player.set_Name(InputTextBox(8, 36, 244, 304));
+    std::string  namePlayer ="";
+    SDL_Texture* text;
+    SDL_Rect  dest;
+    TTF_Font* font;
+    SDL_Color colorText{ 0, 0, 240, 255 };    
+
+    font = TTF_OpenFont("img/arial.ttf", 36);
+
+    if (!font)
+    {
+        std::cerr << " Brak pliku czcionki 'arial.ttf' : " << TTF_GetError() << '\n';
+    }
+
+    SDL_StartTextInput();
 
     bool mousedown = 0;
 
     while (Global::status == Status::CONFIG)
     {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
+        Global::frameStart = SDL_GetTicks();
 
         while (SDL_PollEvent(&Global::input) > 0)
         {
-            switch (Global::input.type) {
+            switch (Global::input.type)
+            {
             case SDL_QUIT: Global::status = Status::EXIT;
+                break;
+            case SDL_TEXTINPUT:                
+                if (namePlayer.size() < Global::NAME_LENGTH)
+                    namePlayer += Global::input.text.text;
+                break;
+            case SDL_KEYDOWN:
+                if (Global::input.key.keysym.sym == SDLK_BACKSPACE && namePlayer.size())
+                    namePlayer.pop_back();
+                if (Global::input.key.keysym.sym == SDLK_RETURN && namePlayer.size())
+                    Global::player->set_Name(namePlayer);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 mousedown = 1;
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */
+                   
                 }
                 mousedown = 0;
                 break;
             }
         }
-        
+
         roll_Maps->Show();
         roll_Weather->Show();
 
@@ -473,44 +510,70 @@ Status Config()
         }
         else chb_Large->set_Mode(tryby::normal);
 
+        if (namePlayer.size())
+        {
+            SDL_Surface* text_surf = TTF_RenderText_Blended(font, namePlayer.c_str(), colorText);
+
+            text = SDL_CreateTextureFromSurface(Global::renderer, text_surf);
+
+            dest.x = 242;
+            dest.y = 308;
+            dest.w = text_surf->w;
+            dest.h = text_surf->h;
+
+            TextureManager::Instance()->Draw("inputBox", 235, 304, 158, 55, 1.0, 0, Global::renderer);
+
+            SDL_RenderCopy(Global::renderer, text, NULL, &dest);
+
+            SDL_DestroyTexture(text);
+            SDL_FreeSurface(text_surf);
+        }
+
         SDL_RenderPresent(Global::renderer);
 
-        Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
+        Global::frameTime = SDL_GetTicks() - Global::frameStart;
 
-        if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
+        if (Global::frameDelay > Global::frameTime)
         {
-            SDL_Delay(Global::frameDelay - Global::frameTime);            
-        }      
+            SDL_Delay(Global::frameDelay - Global::frameTime);
+        }
     }
-    
-    if (chb_Small ->Clicked(Global::input) == tryby::selected) Global::player.set_Weight(50);
-    if (chb_Medium->Clicked(Global::input) == tryby::selected) Global::player.set_Weight(60);
-    if (chb_Large ->Clicked(Global::input) == tryby::selected) Global::player.set_Weight(70);
 
-    chb_WindF->Clicked(Global::input) == tryby::selected ? Global::player.set_Weather(1) : Global::player.set_Weather(0);
+    if (chb_Small->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(50.0);
+    if (chb_Medium->Clicked(Global::input) == tryby::selected) Global::player->set_Weight(60.0);
+    if (chb_Large->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(70.0);
+
+    chb_WindF->Clicked(Global::input) == tryby::selected ? Global::player->set_Wind(1) :        
+                                                           Global::player->set_Wind(0);
+
+    Global::player->set_Weather(roll_Weather->get_Selected());
+    Global::player->set_Maps(roll_Maps->get_Selected());
+
+    TTF_CloseFont(font);
+
+    SDL_StopTextInput();    
 
     delete buttonBack;
     delete buttonStart;
 
     delete chb_Small;
     delete chb_Medium;
-    delete chb_Large; 
-    delete chb_WindF;   
+    delete chb_Large;
+    delete chb_WindF;
 
     delete roll_Maps;
     delete roll_Weather;
 
     return Global::status;
 }
-
-void Loading_Resourses()  // wczytuje pliki graficzne do Texture Managera, sprawdza obecność wszystkich obrazków - OK ?
+void Loading_Resourses()  // wczytuje grafik� do Texture Managera, sprawdza obecno�� plik�w ?
 {
-    TextureManager::Instance()->Load("img/Splash.png"  , "splash", Global::renderer);
-    TextureManager::Instance()->Load("img/Menu.png"    , "menu"  , Global::renderer);
-    TextureManager::Instance()->Load("img/bilboard.jpg", "score" , Global::renderer);
-    TextureManager::Instance()->Load("img/Info.png"    , "info"  , Global::renderer);
-    TextureManager::Instance()->Load("img/under_con.png","start" , Global::renderer);
-    TextureManager::Instance()->Load("img/Configure.png","config", Global::renderer);
+    TextureManager::Instance()->Load("img/Splash.png", "splash", Global::renderer);
+    TextureManager::Instance()->Load("img/Menu.png", "menu", Global::renderer);
+    TextureManager::Instance()->Load("img/bilboard.jpg", "score", Global::renderer);
+    TextureManager::Instance()->Load("img/Info.png", "info", Global::renderer);
+    TextureManager::Instance()->Load("img/under_con.png", "start", Global::renderer);
+    TextureManager::Instance()->Load("img/Configure.png", "config", Global::renderer);
     TextureManager::Instance()->Load("img/ico-skocznia-1.jpg", "skocznia-1", Global::renderer);
     TextureManager::Instance()->Load("img/ico-skocznia-2.png", "skocznia-2", Global::renderer);
     TextureManager::Instance()->Load("img/ico-skocznia-3.png", "skocznia-3", Global::renderer);
@@ -519,120 +582,38 @@ void Loading_Resourses()  // wczytuje pliki graficzne do Texture Managera, spraw
     TextureManager::Instance()->Load("img/weather-snow.png", "snow", Global::renderer);
     TextureManager::Instance()->Load("img/weather-wind.png", "wind", Global::renderer);
     TextureManager::Instance()->Load("img/arrows-right.png", "przewijacz", Global::renderer);
+    TextureManager::Instance()->Load("img/inputBox.png", "inputBox", Global::renderer);
 }
 
-void Release_Resourses()  // zwalnianie zasobów w odwrotnym porządku do ich tworzenia
+void Release_Resourses()  // zwalnianie zasob�w 
 {
+    delete Global::physics;
+    delete Global::player;
+
     SDL_DestroyRenderer(Global::renderer);
-    SDL_DestroyWindow(Global::window);    
 
-    TextureManager::Instance()->DestroyInstance();  // likwiduje singletona TextureManager
+    Global::renderer = nullptr;
 
+    SDL_DestroyWindow(Global::window);
+    
+    Global::window = nullptr;
+    
+    TextureManager::Instance()->DestroyInstance();     
+
+    Mix_Quit();
     TTF_Quit();
     IMG_Quit();
-    SDL_Quit();   
+    SDL_Quit();
 }
-std::string InputTextBox(int lengthText, int highText, int xPos, int yPos)
+
+Uint32 Callback(Uint32 interval, void* param)
 {
-    std::string  input;
-    SDL_Texture* texture, *text;
-    SDL_Event e;
-    SDL_Rect  dest;  
-    TTF_Font* font;
+    Global::physics->set_GammaW(Global::physics->rand_Wind(135.0f, 225.0f)); // (RAND -45/+45 stopni) strza�ka w kierunku na skoczka     
 
-    SDL_Surface* buffer = IMG_Load("img/inputBox.png");
-    if (!buffer) {
-        std::cout << "Error loading image inputBox.png: " << SDL_GetError() << '\n';
-    }
-
-    texture = SDL_CreateTextureFromSurface(Global::renderer, buffer);
-
-    SDL_FreeSurface(buffer);
-
-    buffer = NULL;
-
-    if (!texture) {
-        std::cout << "Error creating texture: " << SDL_GetError() << '\n';
-    }
-
-    font = TTF_OpenFont("img/arial.ttf", highText);
-    if (!font) {
-        std::cout << "Error loading font: " << TTF_GetError() << '\n';
-    }
-
-    SDL_StartTextInput();
-
-    SDL_Color colorText{ 0, 0, 240, 255 };
-
-    SDL_Rect background{ xPos - 12, yPos - 4, 158, 50 };
-
-    bool quit = false;
-
-    bool mousedown = 0;
-
-    while (!quit)
-    {
-        Global::frameStart = SDL_GetTicks();                        // przechowuje czas startu pętli
-        
-        SDL_RenderCopy(Global::renderer, texture, NULL, &background);
-        SDL_RenderPresent(Global::renderer);
-
-        while (SDL_PollEvent(&e) != 0) {
-            switch (e.type) {
-            case SDL_QUIT:
-                quit = true;
-                break;
-            case SDL_TEXTINPUT:
-                input += e.text.text;
-                if (input.size() == lengthText)
-                    quit = true;
-                break;
-            case SDL_KEYDOWN:
-                if (e.key.keysym.sym == SDLK_BACKSPACE && input.size())
-                    input.pop_back();
-                if (e.key.keysym.sym == SDLK_RETURN && input.size())
-                    quit = true;
-                break;                        
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                    /* The SDL_MOUSEBUTTONUP event will be ignored if a
-                       previous SDL_MOUSEBUTTONDOWN event has not occurred. */
-                }
-                mousedown = 0;
-                break;
-            }
-        }
-
-        if (input.size()) {
-            SDL_Surface* text_surf = TTF_RenderText_Solid(font, input.c_str(), colorText);
-            text = SDL_CreateTextureFromSurface(Global::renderer, text_surf);
-
-            dest.x = xPos;
-            dest.y = yPos;
-            dest.w = text_surf->w;
-            dest.h = text_surf->h;
-
-            SDL_RenderCopy(Global::renderer, text, NULL, &dest);
-
-            SDL_RenderPresent(Global::renderer);
-
-            SDL_DestroyTexture(text);
-            SDL_FreeSurface(text_surf);  
-
-            Global::frameTime = SDL_GetTicks() - Global::frameStart;      // ile czasu zabrała iteracja
-
-            if (Global::frameDelay > Global::frameTime)                   // zabezpiecza przed wyświetleniem więcej klatek niż 60/Second
-            {
-                SDL_Delay(Global::frameDelay - Global::frameTime);
-            }
-            SDL_Delay(500);
-        }
-    }
-    SDL_DestroyTexture(texture);
-    SDL_StopTextInput();
-
-    return input;
+    return Uint32(interval);
 }
+
+void Null()
+{
+    ;
+};

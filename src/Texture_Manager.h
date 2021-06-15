@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -21,7 +22,7 @@ public:
     void DestroyInstance()
     {
         delete pInstance;
-               pInstance = nullptr;
+        pInstance = nullptr;
     };
 
     bool Load(std::string fileName, std::string id, SDL_Renderer* renderer);
@@ -40,7 +41,7 @@ private:
 
     static TextureManager* pInstance;
 
-     TextureManager() {}                                        // zabezpiecza przed stworzeniem nowej instancji
+    TextureManager()  {}                                        // zabezpiecza przed stworzeniem nowej instancji
     ~TextureManager() {}                                        // zabezpiecza przed niechcian� likwidacj�    
     TextureManager(const TextureManager&);                      // zabezpiecza przed stworzeniem poprzez kopiowanie
     TextureManager& operator=(const TextureManager&) = delete;  // zabezpiecza przed do��czeniem poprzez =
