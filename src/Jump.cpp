@@ -103,6 +103,8 @@ Fazy_skoku Jump::Czeka()
     rect_skoczek = { 88,  85,  38,  38 };
     rect_wyskok  = { 310, 220,  38, 38 };
 
+    physics->set_Wybicie(false);
+
     SDL_RenderCopy(ren, rampa, NULL, NULL);
     SDL_RenderCopy(ren, jumper_na_rampie, NULL, &rect_skoczek);
     SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
@@ -178,26 +180,26 @@ Fazy_skoku Jump::Landing()
 
 Fazy_skoku Jump::Wyskok()
 {
-    Uint32 poczatek_skoku = SDL_GetTicks();             // Zaczynamy liczyæ czas skoku po wybiciu z rampy 
+    Uint32 poczatek_skoku = SDL_GetTicks();             // Zaczynamy liczyï¿½ czas skoku po wybiciu z rampy 
 
     double dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
-    double alfa = 0.0;                                  // brak wybicia skoczka w górê, czyli k¹t 0 stopni
+    double alfa = 0.0;                                  // brak wybicia skoczka w gï¿½rï¿½, czyli kï¿½t 0 stopni
     double masa = player->get_Weight();                 // masa skoczka
-    double Cd = 0.0;                                    // wspó³czynnik oporu powietrza                                                                                   
-    double Cw = 0.0;                                    // wspó³czynnik wiatru  
-    double Vw = 3.0;                                    // prêdkoœæ wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
-                                                        // double GammaW = 0.0; kierunek wiatru - k¹t w stosunku do skoczka
-                                                        // 0 stopni to idea³ (RAND -45/+45 stopni)
-    double Vm = physics->getVelocity();                 // prêdkoœæ skoczka na progu !     
+    double Cd = 0.0;                                    // wspï¿½czynnik oporu powietrza                                                                                   
+    double Cw = 0.0;                                    // wspï¿½czynnik wiatru  
+    double Vw = 3.0;                                    // prï¿½dkoï¿½ï¿½ wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
+                                                        // double GammaW = 0.0; kierunek wiatru - kï¿½t w stosunku do skoczka
+                                                        // 0 stopni to ideaï¿½ (RAND -45/+45 stopni)
+    double Vm = physics->getVelocity();                 // prï¿½dkoï¿½ï¿½ skoczka na progu !     
 
-    physics->get_Wybicie() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKOŒNY, nie to POZIOMY i k¹t równy 0 !   
-                                                        // wzór jest ten sam, ale istotny jest 'k¹t alfa' który decyduje o odleg³oœci
-    double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wspó³rzêdne x 
+    physics->get_Wybicie() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKOï¿½NY, nie to POZIOMY i kï¿½t rï¿½wny 0 !   
+                                                        // wzï¿½r jest ten sam, ale istotny jest 'kï¿½t alfa' ktï¿½ry decyduje o odlegï¿½oï¿½ci
+    double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wspï¿½rzï¿½dne x 
     double Vy = Vm * sin(alfa * physics->Deg2Rad);      //    -//-       -//-    y
-    double g  = 9.81;                                   // przyœpieszenie ziemskie  
-    double Sx1 = 310.0;                                 // punkt wspó³rzêdnej x - miejsce wybicia z rampy skoczni 
-    double Sy1 = 220.0;                                 // punkt wspó³rzêdnej y - miejsce wybicia z rampy skoczni
-    double SX = 0.0, SY = 0.0;                          // wspó³rzêdne x,y po przeliczeniu   
+    double g  = 9.81;                                   // przyï¿½pieszenie ziemskie  
+    double Sx1 = 310.0;                                 // punkt wspï¿½rzï¿½dnej x - miejsce wybicia z rampy skoczni 
+    double Sy1 = 220.0;                                 // punkt wspï¿½rzï¿½dnej y - miejsce wybicia z rampy skoczni
+    double SX = 0.0, SY = 0.0;                          // wspï¿½rzï¿½dne x,y po przeliczeniu   
 
     Uint32 czas_lotu  = 0;
     bool chce_ladowac = false;
@@ -238,7 +240,7 @@ Fazy_skoku Jump::Wyskok()
 
         if (physics->check_Collision(surfaceRamp, rect_wyskok.x, rect_wyskok.y + 6))
         {
-            skok = Fazy_skoku::TELEMARK;    // skoczek wyl¹dowa³
+            skok = Fazy_skoku::TELEMARK;    // skoczek wyladowal
         }
 
         if (chce_ladowac)

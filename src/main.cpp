@@ -104,6 +104,9 @@ int main(int argc, char* argv[])    // Beginning program
 
         while (Global::status != Status::EXIT)
         {
+            SDL_WarpMouseGlobal(600, 600);
+            SDL_Delay(100);
+
             while (SDL_PollEvent(&Global::input) > 0)
             {
                 switch (Global::input.type)
@@ -542,6 +545,12 @@ Status Config()
     if (chb_Small->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(50.0);
     if (chb_Medium->Clicked(Global::input) == tryby::selected) Global::player->set_Weight(60.0);
     if (chb_Large->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(70.0);
+
+    if(!Global::player->get_Weight())
+        Global::player->set_Weight(80.0);
+
+    if(!Global::player->get_Name().length())
+        Global::player->set_Name("Anonim");
 
     chb_WindF->Clicked(Global::input) == tryby::selected ? Global::player->set_Wind(1) :        
                                                            Global::player->set_Wind(0);
