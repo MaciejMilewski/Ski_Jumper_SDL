@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include "Jump.h"
 
@@ -68,6 +69,41 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
     wind_table = IMG_LoadTexture(ren,"img/wind-table.png");
 };
 
+void Jump::ShowDashboard() 
+{
+    std::stringstream Vm_ss;
+    Vm_ss << physics->getVelocity();
+    Dashboard jumper_velocity_dashboard(Vm_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos, ren);
+    jumper_velocity_dashboard.Show();
+
+    std::stringstream alfa_ss;
+    alfa_ss << alfa;
+    Dashboard jump_angle_dashboard(alfa_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+dashboard_interval, ren);
+    jump_angle_dashboard.Show();
+
+    std::string weather;
+    switch (player->get_Weather()) // "rain", "sun",  "snow", "wind"
+    {
+        case 0: weather = "rain"; break;
+        case 1: weather = "sun"; break;
+        case 2: weather = "snow"; break;
+        case 3: weather = "wind"; break;
+    }
+
+    Dashboard weather_dashboard(weather.c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+2*dashboard_interval, ren);
+    weather_dashboard.Show();
+
+    std::stringstream Vw_ss;
+    Vw_ss << Vw;
+    Dashboard wind_velocity_dashboard(Vw_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+3*dashboard_interval, ren);
+    wind_velocity_dashboard.Show();
+
+    std::stringstream Gamma_ss;
+    Gamma_ss << physics->get_GammaW();
+    Dashboard wind_angle_dashboard(Gamma_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+4*dashboard_interval, ren);
+    wind_angle_dashboard.Show();
+}
+
 Jump::~Jump()
 {
     SDL_DestroyTexture(rampa);
@@ -98,6 +134,7 @@ Jump::~Jump()
     player = nullptr;
     ren = nullptr;
 };
+
 Fazy_skoku Jump::Czeka()
 {
     rect_skoczek = { 88,  85,  38,  38 };
@@ -106,6 +143,10 @@ Fazy_skoku Jump::Czeka()
     physics->set_Wybicie(false);
 
     SDL_RenderCopy(ren, rampa, NULL, NULL);
+
+    SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+    ShowDashboard();
+
     SDL_RenderCopy(ren, jumper_na_rampie, NULL, &rect_skoczek);
     SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
     SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
@@ -129,7 +170,10 @@ Fazy_skoku Jump::Landing()
         frameStart = SDL_GetTicks();
 
         SDL_RenderCopy(ren, rampa, NULL, NULL);
+
         SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        ShowDashboard();
+
         SDL_RenderCopyEx(ren, jumper_telemark, NULL, &rect_wyskok, angle_skoczek, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
@@ -182,24 +226,24 @@ Fazy_skoku Jump::Wyskok()
 {
     Uint32 poczatek_skoku = SDL_GetTicks();             // Zaczynamy liczy� czas skoku po wybiciu z rampy 
 
-    double dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
-    double alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
-    double masa = player->get_Weight();                 // masa skoczka
-    double Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
-    double Cw = 0.0;                                    // wsp�czynnik wiatru  
-    double Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
+    dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
+    alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
+    masa = player->get_Weight();                 // masa skoczka
+    Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
+    Cw = 0.0;                                    // wsp�czynnik wiatru  
+    Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
                                                         // double GammaW = 0.0; kierunek wiatru - k�t w stosunku do skoczka
                                                         // 0 stopni to idea� (RAND -45/+45 stopni)
-    double Vm = physics->getVelocity();                 // pr�dko�� skoczka na progu !     
+    Vm = physics->getVelocity();                 // pr�dko�� skoczka na progu !     
 
     physics->get_Wybicie() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKO�NY, nie to POZIOMY i k�t r�wny 0 !   
                                                         // wz�r jest ten sam, ale istotny jest 'k�t alfa' kt�ry decyduje o odleg�o�ci
     double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wsp�rz�dne x 
     double Vy = Vm * sin(alfa * physics->Deg2Rad);      //    -//-       -//-    y
-    double g  = 9.81;                                   // przy�pieszenie ziemskie  
-    double Sx1 = 310.0;                                 // punkt wsp�rz�dnej x - miejsce wybicia z rampy skoczni 
-    double Sy1 = 220.0;                                 // punkt wsp�rz�dnej y - miejsce wybicia z rampy skoczni
-    double SX = 0.0, SY = 0.0;                          // wsp�rz�dne x,y po przeliczeniu   
+    g  = 9.81;                                   // przy�pieszenie ziemskie  
+    Sx1 = 310.0;                                 // punkt wsp�rz�dnej x - miejsce wybicia z rampy skoczni 
+    Sy1 = 220.0;                                 // punkt wsp�rz�dnej y - miejsce wybicia z rampy skoczni
+    SX = 0.0, SY = 0.0;                          // wsp�rz�dne x,y po przeliczeniu   
 
     Uint32 czas_lotu  = 0;
     bool chce_ladowac = false;
@@ -221,6 +265,10 @@ Fazy_skoku Jump::Wyskok()
         frameStart = SDL_GetTicks();
 
         SDL_RenderCopy(ren, rampa, NULL, NULL);
+
+        SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        ShowDashboard();
+
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
 
@@ -301,7 +349,10 @@ Fazy_skoku Jump::Zjazd()
         frameStart = SDL_GetTicks();
 
         SDL_RenderCopy(ren, rampa, NULL, NULL);
+
         SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        ShowDashboard();
+
         SDL_RenderCopyEx(ren, jumper_na_rampie, NULL, &rect_skoczek, angle_skoczek, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
@@ -354,6 +405,7 @@ Fazy_skoku Jump::Zjazd()
     }
     return skok;
 };
+
 void Jump::set_Render(SDL_Renderer* r)
 {
     ren = r;
