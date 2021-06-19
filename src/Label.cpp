@@ -1,8 +1,8 @@
-#include "Dashboard.h"
+#include "Label.h"
 #include <iostream>
 #include <sstream>
 
-Dashboard::Dashboard(const char* label, unsigned int fontSize, int posX, int posY, SDL_Renderer* render)
+Label::Label(const char* label, unsigned int fontSize, int posX, int posY, SDL_Renderer* render)
 {
     this->posX = posX;
     this->posY = posY;
@@ -39,7 +39,7 @@ Dashboard::Dashboard(const char* label, unsigned int fontSize, int posX, int pos
 
 }
 
-Dashboard::~Dashboard()
+Label::~Label()
 {
     canvas = nullptr;
     SDL_DestroyTexture(mText);
@@ -48,7 +48,7 @@ Dashboard::~Dashboard()
     pFont = nullptr;
 } 
 
-void Dashboard::Show()
+void Label::Show()
 {
     SDL_RenderCopy(this->render, mText, NULL, &dest);
 }

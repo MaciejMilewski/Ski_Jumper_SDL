@@ -3,10 +3,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-class Dashboard {
+class Label {
     public:
-        Dashboard(const char* label, unsigned int fontSize, int posX, int posY, SDL_Renderer* render);
-        virtual ~Dashboard();
+        Label(const char* label, unsigned int fontSize, int posX, int posY, SDL_Renderer* render);
+        virtual ~Label();
 
         void Show();
     private:

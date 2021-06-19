@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <math.h>
 
 #include "Jump.h"
 
@@ -67,19 +68,37 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
     wind_arrow = IMG_LoadTexture(ren,"img/arrow-wind.png");
     wind_table = IMG_LoadTexture(ren,"img/wind-table.png");
+
+    Particle::Style style = Particle::Style::NONE;
+    
+    switch (player->get_Weather())
+    {
+        case 0: style = Particle::Style::RAIN; break;
+        case 1: style = Particle::Style::SUN ; break;
+        case 2: style = Particle::Style::SNOW; break;
+        case 3: style = Particle::Style::NONE; break;
+    }
+
+    particle->setRenderer(ren);
+    particle->setPosition(400, 50);                   
+    particle->setStyle(style);                        
+    particle->setStartSpin(0);
+    particle->setEndSpin(190);
+    particle->setStartSpinVar(90);
+    particle->setEndSpinVar(190);
 };
 
 void Jump::ShowDashboard() 
 {
     std::stringstream Vm_ss;
     Vm_ss << physics->getVelocity();
-    Dashboard jumper_velocity_dashboard(Vm_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos, ren);
-    jumper_velocity_dashboard.Show();
+    Label jumper_velocity_label(Vm_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos, ren);
+    jumper_velocity_label.Show();
 
     std::stringstream alfa_ss;
     alfa_ss << alfa;
-    Dashboard jump_angle_dashboard(alfa_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+dashboard_interval, ren);
-    jump_angle_dashboard.Show();
+    Label jump_angle_label(alfa_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+dashboard_interval, ren);
+    jump_angle_label.Show();
 
     std::string weather;
     switch (player->get_Weather()) // "rain", "sun",  "snow", "wind"
@@ -90,18 +109,18 @@ void Jump::ShowDashboard()
         case 3: weather = "wind"; break;
     }
 
-    Dashboard weather_dashboard(weather.c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+2*dashboard_interval, ren);
-    weather_dashboard.Show();
+    Label weather_label(weather.c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+2*dashboard_interval, ren);
+    weather_label.Show();
 
     std::stringstream Vw_ss;
     Vw_ss << Vw;
-    Dashboard wind_velocity_dashboard(Vw_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+3*dashboard_interval, ren);
-    wind_velocity_dashboard.Show();
+    Label wind_velocity_label(Vw_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+3*dashboard_interval, ren);
+    wind_velocity_label.Show();
 
     std::stringstream Gamma_ss;
     Gamma_ss << physics->get_GammaW();
-    Dashboard wind_angle_dashboard(Gamma_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+4*dashboard_interval, ren);
-    wind_angle_dashboard.Show();
+    Label wind_angle_label(Gamma_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+4*dashboard_interval, ren);
+    wind_angle_label.Show();
 }
 
 Jump::~Jump()
@@ -130,6 +149,7 @@ Jump::~Jump()
     wind_table = nullptr;
     surfaceRamp = nullptr;
 
+    delete particle;
     physics = nullptr; 
     player = nullptr;
     ren = nullptr;
@@ -148,6 +168,7 @@ Fazy_skoku Jump::Czeka()
     ShowDashboard();
 
     SDL_RenderCopy(ren, jumper_na_rampie, NULL, &rect_skoczek);
+    particle->draw();
     SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
     SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
 
@@ -175,6 +196,7 @@ Fazy_skoku Jump::Landing()
         ShowDashboard();
 
         SDL_RenderCopyEx(ren, jumper_telemark, NULL, &rect_wyskok, angle_skoczek, NULL, SDL_FLIP_NONE);
+        particle->draw();
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(ren);
@@ -267,6 +289,7 @@ Fazy_skoku Jump::Wyskok()
         SDL_RenderCopy(ren, rampa, NULL, NULL);
 
         SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        particle->draw();
         ShowDashboard();
 
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
@@ -289,6 +312,8 @@ Fazy_skoku Jump::Wyskok()
         if (physics->check_Collision(surfaceRamp, rect_wyskok.x, rect_wyskok.y + 6))
         {
             skok = Fazy_skoku::TELEMARK;    // skoczek wyladowal
+            int score = (int)sqrt((rect_wyskok.x - 310)*(rect_wyskok.x - 310) + (rect_wyskok.y - 220)*(rect_wyskok.y - 220));
+            player->set_Score(score);
         }
 
         if (chce_ladowac)
@@ -354,6 +379,7 @@ Fazy_skoku Jump::Zjazd()
         ShowDashboard();
 
         SDL_RenderCopyEx(ren, jumper_na_rampie, NULL, &rect_skoczek, angle_skoczek, NULL, SDL_FLIP_NONE);
+        particle->draw();
         SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
         SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(ren);

@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Physics.h"
 #include "Jump.h"
+#include "Label.h"
 
 enum class Status { MENU, START, SCORE, INFO, CONFIG, EXIT };
 
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])    // Beginning program
         }
 
         Global::window = SDL_CreateWindow("Skoki narciarskie", SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+            SDL_WINDOWPOS_CENTERED, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
 
         if (!Global::window) {
             throw SDL_GetError();
@@ -295,8 +296,17 @@ Status Start() // Skoki !
 Status Scoreboard() // pokazuje tablic� wynik�w skok�w
 {
     TextureManager::Instance()->Draw("score", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
-
     Button* buttonScore = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 40, 535, *Global::renderer);
+
+    if(Global::player->get_Name() != "")
+    {
+        Label player_name_label(Global::player->get_Name().c_str(), 24, 410, 250, Global::renderer);
+        player_name_label.Show();
+
+        std::string score_str = std::to_string(Global::player->get_Score());
+        Label player_score_label(score_str.c_str(), 24, 620, 250, Global::renderer);
+        player_score_label.Show();
+    }
 
     bool mousedown = 0;    
 
@@ -445,6 +455,7 @@ Status Config()
             case SDL_TEXTINPUT:                
                 if (namePlayer.size() < Global::NAME_LENGTH)
                     namePlayer += Global::input.text.text;
+                Global::player->set_Name(namePlayer);  
                 break;
             case SDL_KEYDOWN:
                 if (Global::input.key.keysym.sym == SDLK_BACKSPACE && namePlayer.size())
@@ -549,7 +560,7 @@ Status Config()
     if(!Global::player->get_Weight())
         Global::player->set_Weight(80.0);
 
-    if(!Global::player->get_Name().length())
+    if(Global::player->get_Name().length() < 1)
         Global::player->set_Name("Anonim");
 
     chb_WindF->Clicked(Global::input) == tryby::selected ? Global::player->set_Wind(1) :        

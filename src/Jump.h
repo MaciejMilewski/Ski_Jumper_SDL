@@ -5,7 +5,8 @@
 
 #include "Physics.h"
 #include "Player.h"
-#include "Dashboard.h"
+#include "Label.h"
+#include "Particle.h"
 
 enum class Fazy_skoku { CZEKA, ZJAZD, SKOK, TELEMARK, END };
 
@@ -44,6 +45,8 @@ public:
 
     Physics *physics = nullptr;
     Player*  player  = nullptr;
+
+    Particle* particle = new Particle();
 
     const int dashboard_x_pos = 143;
     const int dashboard_y_pos = 431;
