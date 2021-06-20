@@ -101,8 +101,6 @@ int main(int argc, char* argv[])    // Beginning program
 
         // ------------------------ MAIN LOOP ----------------------- //
 
-        bool mousedown = 0;
-
         while (Global::status != Status::EXIT)
         {
             SDL_WarpMouseGlobal(600, 600);
@@ -112,17 +110,8 @@ int main(int argc, char* argv[])    // Beginning program
             {
                 switch (Global::input.type)
                 {
-                case SDL_QUIT: Global::status = Status::EXIT;
-                    break;
-                case SDL_MOUSEBUTTONDOWN:
-                    mousedown = 1;
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    if (mousedown) {
-                        
-                    }
-                    mousedown = 0;
-                    break;
+                    case SDL_QUIT: Global::status = Status::EXIT;
+                        break;
                 }
             }
 
@@ -154,6 +143,8 @@ void Splash()   //  pierwszy ekran
     TextureManager::Instance()->Draw("splash", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1, 0, Global::renderer);
 
     SDL_Surface* app_ico = IMG_Load("img/ski_Icon.jpg");  // Ikona dla aplikacji 
+    Mix_Music* music = Mix_LoadMUS("mixkit-just-chill-16.wav");
+    Mix_PlayMusic(music, 1); // 1 oznacza jedno odtworzenie pliku, -1 infinity
 
     if (!app_ico)
     {
@@ -163,7 +154,8 @@ void Splash()   //  pierwszy ekran
     SDL_SetWindowIcon(Global::window, app_ico);
     SDL_FreeSurface(app_ico);
     SDL_RenderPresent(Global::renderer);
-    SDL_Delay(3000);
+    SDL_Delay(5000);
+    Mix_FreeMusic(music);
 
     TextureManager::Instance()->clearFromTextureMap("splash");  
 }
@@ -177,7 +169,6 @@ Status Menu() // zarz�dza Menu G��wnym
     Button* buttonStore = new Button("img/score_button.png", "img/scoreS_button.png", 130, 60, 410, 530, *Global::renderer);
     Button* buttonExits = new Button("img/Exits_button.png", "img/ExitsS_button.png", 100, 52, 610, 530, *Global::renderer);
 
-    bool mousedown = 0;
 
     while (Global::status == Status::MENU)
     {
@@ -185,18 +176,10 @@ Status Menu() // zarz�dza Menu G��wnym
 
         while (SDL_PollEvent(&Global::input) > 0)
         {
-            switch (Global::input.type) {
-            case SDL_QUIT: Global::status = Status::EXIT;
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                    
-                }
-                mousedown = 0;
-                break;
+            switch (Global::input.type) 
+            {
+                case SDL_QUIT: Global::status = Status::EXIT;
+                    break;
             }
         }
 
@@ -308,7 +291,6 @@ Status Scoreboard() // pokazuje tablic� wynik�w skok�w
         player_score_label.Show();
     }
 
-    bool mousedown = 0;    
 
     while (Global::status == Status::SCORE)
     {
@@ -316,18 +298,10 @@ Status Scoreboard() // pokazuje tablic� wynik�w skok�w
 
         while (SDL_PollEvent(&Global::input) > 0)
         {
-            switch (Global::input.type) {
-            case SDL_QUIT: Global::status = Status::EXIT;
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                   
-                }
-                mousedown = 0;
-                break;
+            switch (Global::input.type) 
+            {
+                case SDL_QUIT: Global::status = Status::EXIT;
+                    break;
             }
         }
 
@@ -358,7 +332,6 @@ Status Info() // zarz�dza ekranem INFO
 
     Button* buttonInfo = new Button("img/back_button.png", "img/backS_button.png", 90, 52, 40, 540, *Global::renderer);
 
-    bool mousedown = 0;
 
     while (Global::status == Status::INFO)
     {
@@ -366,18 +339,10 @@ Status Info() // zarz�dza ekranem INFO
 
         while (SDL_PollEvent(&Global::input) > 0)
         {
-            switch (Global::input.type) {
-            case SDL_QUIT: Global::status = Status::EXIT;
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                    
-                }
-                mousedown = 0;
-                break;
+            switch (Global::input.type) 
+            {
+                case SDL_QUIT: Global::status = Status::EXIT;
+                    break;
             }
         }
 
@@ -440,7 +405,6 @@ Status Config()
 
     SDL_StartTextInput();
 
-    bool mousedown = 0;
 
     while (Global::status == Status::CONFIG)
     {
@@ -450,28 +414,19 @@ Status Config()
         {
             switch (Global::input.type)
             {
-            case SDL_QUIT: Global::status = Status::EXIT;
-                break;
-            case SDL_TEXTINPUT:                
-                if (namePlayer.size() < Global::NAME_LENGTH)
-                    namePlayer += Global::input.text.text;
-                Global::player->set_Name(namePlayer);  
-                break;
-            case SDL_KEYDOWN:
-                if (Global::input.key.keysym.sym == SDLK_BACKSPACE && namePlayer.size())
-                    namePlayer.pop_back();
-                if (Global::input.key.keysym.sym == SDLK_RETURN && namePlayer.size())
-                    Global::player->set_Name(namePlayer);
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                mousedown = 1;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if (mousedown) {
-                   
-                }
-                mousedown = 0;
-                break;
+                case SDL_QUIT: Global::status = Status::EXIT;
+                    break;
+                case SDL_TEXTINPUT:                
+                    if (namePlayer.size() < Global::NAME_LENGTH)
+                        namePlayer += Global::input.text.text;
+                    Global::player->set_Name(namePlayer);  
+                    break;
+                case SDL_KEYDOWN:
+                    if (Global::input.key.keysym.sym == SDLK_BACKSPACE && namePlayer.size())
+                        namePlayer.pop_back();
+                    if (Global::input.key.keysym.sym == SDLK_RETURN && namePlayer.size())
+                        Global::player->set_Name(namePlayer);
+                    break;
             }
         }
 

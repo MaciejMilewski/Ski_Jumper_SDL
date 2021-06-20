@@ -32,7 +32,7 @@ void Particle::setStyle(Style style)
     {
         initWithTotalParticles(350);
 
-        // dzia³anie bez przerwy
+        // dziaï¿½anie bez przerwy
         _duration = DURATION_INFINITY;
 
         // Tryb Grawitacja
@@ -40,31 +40,31 @@ void Particle::setStyle(Style style)
        
         setGravity(Vec2(0, 0));
 
-        // przyœpieszenie
+        // przyï¿½pieszenie
         setRadialAccel(0);
         setRadialAccelVar(0);
 
-        // prêdkoœæ cz¹steczek
+        // prï¿½dkoï¿½ï¿½ czï¿½steczek
         setSpeed(-20);
         setSpeedVar(5);
 
-        // k¹ty
+        // kï¿½ty
         _angle = 90;
         _angleVar = 360;
 
-        // ¿ycie cz¹steczek
+        // ï¿½ycie czï¿½steczek
         _life = 1;
         _lifeVar = 0.5f;
 
-        // wielkoœæ pixeli
+        // wielkoï¿½ï¿½ pixeli
         _startSize = 30.0f;
         _startSizeVar = 10.0f;
         _endSize = START_SIZE_EQUAL_TO_END_SIZE;
 
-        // emisja na sekundê
+        // emisja na sekundï¿½
         _emissionRate = _totalParticles / _life;
 
-        // kolory cz¹stek
+        // kolory czï¿½stek
         _startColor.r = 0.76f;
         _startColor.g = 0.25f;
         _startColor.b = 0.12f;
@@ -91,8 +91,8 @@ void Particle::setStyle(Style style)
         _duration = DURATION_INFINITY;        
         setEmitterMode(Mode::GRAVITY);       
         setGravity(Vec2(0, 1));
-        setSpeed(-5);
-        setSpeedVar(1);
+        setSpeed(-35);
+        setSpeedVar(5);
 
         setRadialAccel(0);
         setRadialAccelVar(1);
