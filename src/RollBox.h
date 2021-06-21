@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "Texture_Manager.h"
+#include "TextureManager.h"
 
 /* przycisk RollBox element GUI                                                                         */
 /* PARAM 'tab[]'  - tablica z nazwami textur kt�re s� w kontenerze map, obrazki kolejno b�d�            */

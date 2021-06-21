@@ -4,7 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "Texture_Manager.h"
+#include "TextureManager.h"
 #include "Button.h"
 #include "CheckBox.h"
 #include "RollBox.h"
