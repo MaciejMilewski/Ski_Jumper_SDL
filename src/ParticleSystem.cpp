@@ -79,7 +79,7 @@ bool ParticleSystem::initWithTotalParticles(int numberOfParticles)
 
 void ParticleSystem::resetTotalParticles(int numberOfParticles)
 {
-    if (particle_data_.size() < int(numberOfParticles))
+    if (particle_data_.size() < (long unsigned int)(numberOfParticles))
     {
         particle_data_.resize(numberOfParticles);
     }
@@ -341,7 +341,7 @@ void ParticleSystem::update()
     {
         if (particle_data_[i].timeToLive <= 0.0f)
         {
-            int j = _particleCount - 1;
+            // int j = _particleCount - 1;
            
             particle_data_[i] = particle_data_[_particleCount - 1];
             --_particleCount;

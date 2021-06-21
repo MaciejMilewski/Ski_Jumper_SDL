@@ -34,8 +34,9 @@ void RollBox::Clicked(SDL_Event& e)
 
     int arrX = posX + 5 + width, arrY = int(posY + height * 0.5 - 15);
 
-    bool mode = (mouse_XY.x >= arrX && mouse_XY.x <= arrX + 30 && mouse_XY.y >= arrY && mouse_XY.y <= arrY + 30) ?
-        mode = true : mode = false;
+    bool mode = false;
+    mode = (mouse_XY.x >= arrX && mouse_XY.x <= arrX + 30 && mouse_XY.y >= arrY && mouse_XY.y <= arrY + 30) ?
+        true : false;
 
     if ((mode == true) && (e.type == SDL_MOUSEBUTTONDOWN)) {
 

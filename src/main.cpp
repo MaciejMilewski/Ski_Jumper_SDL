@@ -122,6 +122,7 @@ int main(int argc, char* argv[])    // Beginning program
             case Status::SCORE:  Scoreboard(); break;   
             case Status::INFO:   Info();       break;   
             case Status::CONFIG: Config();     break;
+            case Status::EXIT:                 break;
             }
         }
 

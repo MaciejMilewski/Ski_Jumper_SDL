@@ -16,6 +16,7 @@ public:
     Jump(SDL_Renderer* render, Physics* physics, Player* player);
     ~Jump();
 
+    SDL_Renderer* ren;  
     SDL_Rect rect_skoczek = { 88,  85,  38,  38 };
     SDL_Rect rect_wyskok = { 310, 220,  38,  38 };
     SDL_Rect rect_arrow = { 650,  55,  88,  88 };
@@ -43,7 +44,7 @@ public:
     void ShowDashboard();
     void set_Render(SDL_Renderer* r);
 
-    Physics *physics = nullptr;
+    Physics* physics = nullptr;
     Player*  player  = nullptr;
 
     Particle* particle = new Particle();
@@ -72,6 +73,4 @@ public:
     double Sx1 = 310.0;                                 // punkt wsp�rz�dnej x - miejsce wybicia z rampy skoczni 
     double Sy1 = 220.0;                                 // punkt wsp�rz�dnej y - miejsce wybicia z rampy skoczni
     double SX = 0.0, SY = 0.0;                          // wsp�rz�dne x,y po przeliczeniu   
-
-    SDL_Renderer* ren;         
 };

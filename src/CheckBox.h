@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-enum class tryby { normal, pressed, selected };
+enum class tryby { normal, selected };
 
 class CheckBox
 {
