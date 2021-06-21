@@ -22,7 +22,7 @@ inline float clampf(float value, float min_inclusive, float max_inclusive)
     return value < min_inclusive ? min_inclusive : value < max_inclusive ? value : max_inclusive;
 }
 
-inline void normalize_point(float x, float y, Pointf* out)
+inline void normalizePoint(float x, float y, Pointf* out)
 {
     float n = x * x + y * y;
     
@@ -357,7 +357,7 @@ void ParticleSystem::update()
             // radial acceleration
             if (particle_data_[i].posx || particle_data_[i].posy)
             {
-                normalize_point(particle_data_[i].posx, particle_data_[i].posy, &radial);
+                normalizePoint(particle_data_[i].posx, particle_data_[i].posy, &radial);
             }
             tangential = radial;
             radial.x *= particle_data_[i].modeA.radialAccel;

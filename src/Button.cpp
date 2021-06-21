@@ -14,18 +14,18 @@ Button::Button(const char* normalImagePath, const char* selectedImagePath,
     this->imagePath = normalImagePath;
     this->selectedImagePath = selectedImagePath;
 
-    loaded_surface = IMG_Load(selectedImagePath);
-    selectedImage = SDL_CreateTextureFromSurface(&render, loaded_surface);
+    loadedSurface = IMG_Load(selectedImagePath);
+    selectedImage = SDL_CreateTextureFromSurface(&render, loadedSurface);
 
     if (!selectedImage)
         std::cout << " Nie stworzono 'surface' z pliku " << selectedImagePath << ", " << SDL_GetError() << '\n';
-    SDL_FreeSurface(loaded_surface);
+    SDL_FreeSurface(loadedSurface);
 
-    loaded_surface = IMG_Load(normalImagePath);
-    normalImage = SDL_CreateTextureFromSurface(&render, loaded_surface);
+    loadedSurface = IMG_Load(normalImagePath);
+    normalImage = SDL_CreateTextureFromSurface(&render, loadedSurface);
     if (!normalImage)
         std::cout << " Nie stworzono 'surface' z " << normalImagePath << ", " << SDL_GetError() << '\n';
-    SDL_FreeSurface(loaded_surface);
+    SDL_FreeSurface(loadedSurface);
 }
 
 Button::~Button()
@@ -46,12 +46,12 @@ int Button::GetY()
     return posY;
 }
 
-enum tryb Button::Clicked(SDL_Event& e)
+enum Mode Button::Clicked(SDL_Event& e)
 {
     SDL_GetMouseState(&mouse_XY.x, &mouse_XY.y);
 
     mode = (mouse_XY.x >= posX && mouse_XY.x <= posX + width && mouse_XY.y >= posY && mouse_XY.y <= posY + height) ?
-        tryb::pressed : tryb::normal;
+        Mode::pressed : Mode::normal;
 
     bool mousedown = 0;
 
@@ -62,7 +62,7 @@ enum tryb Button::Clicked(SDL_Event& e)
 
     if (mousedown || e.type == SDL_MOUSEBUTTONUP)
     {
-        if (mode == tryb::pressed)  mode = tryb::selected;
+        if (mode == Mode::pressed)  mode = Mode::selected;
         
         SDL_Delay(30);
        
@@ -80,17 +80,17 @@ void Button::ShowButton()
     dest.h = height;
 
     switch (mode) {
-    case tryb::normal:
+    case Mode::normal:
         SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
         SDL_RenderDrawRect(render, &dest);
         SDL_RenderCopy(render, normalImage, NULL, &dest);
         break;
-    case tryb::pressed:
+    case Mode::pressed:
         SDL_SetRenderDrawColor(render, 0, 123, 0, 255);
         SDL_RenderDrawRect(render, &dest);
         SDL_RenderCopy(render, normalImage, NULL, &dest);
         break;
-    case tryb::selected:
+    case Mode::selected:
         SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
         SDL_RenderDrawRect(render, &dest);
         SDL_RenderCopy(render, selectedImage, NULL, &dest);

@@ -6,7 +6,7 @@
 
 Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render), physics(physics), player(player)
 {
-    rampa = IMG_LoadTexture(ren,"img/rampa.png");    
+    ramp = IMG_LoadTexture(ren,"img/rampa.png");    
 
     surfaceRamp = IMG_Load("img/rampa.png");    
 
@@ -14,7 +14,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadSurface, SDL_TRUE, SDL_MapRGB(loadSurface->format, 255, 255, 255));
 
-    jumper_na_rampie = SDL_CreateTextureFromSurface(ren, loadSurface);
+    jumperOnRamp = SDL_CreateTextureFromSurface(ren, loadSurface);
 
         SDL_FreeSurface(loadSurface);
 
@@ -22,7 +22,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadWybicie, SDL_TRUE, SDL_MapRGB(loadWybicie->format, 255, 255, 255)); 
 
-    jumper_wybicie = SDL_CreateTextureFromSurface(ren, loadWybicie);
+    jumperStartingJump = SDL_CreateTextureFromSurface(ren, loadWybicie);
 
         SDL_FreeSurface(loadWybicie);
 
@@ -30,7 +30,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadPochylony, SDL_TRUE, SDL_MapRGB(loadPochylony->format, 255, 255, 255));
 
-    jumper_pochylony = SDL_CreateTextureFromSurface(ren, loadPochylony);
+    jumperLeaning = SDL_CreateTextureFromSurface(ren, loadPochylony);
 
         SDL_FreeSurface(loadPochylony);
 
@@ -38,7 +38,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadSzybuje, SDL_TRUE, SDL_MapRGB(loadSzybuje->format, 255, 255, 255));
 
-    jumper_szybuje = SDL_CreateTextureFromSurface(ren, loadSzybuje);
+    jumperSoars = SDL_CreateTextureFromSurface(ren, loadSzybuje);
 
         SDL_FreeSurface(loadSzybuje);
 
@@ -46,7 +46,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadLaduje, SDL_TRUE, SDL_MapRGB(loadLaduje->format, 255, 255, 255));
 
-    jumper_do_ladowania = SDL_CreateTextureFromSurface(ren, loadLaduje);
+    jumperToLanding = SDL_CreateTextureFromSurface(ren, loadLaduje);
 
         SDL_FreeSurface(loadLaduje);
 
@@ -54,7 +54,7 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_SetColorKey(loadTelemark, SDL_TRUE, SDL_MapRGB(loadTelemark->format, 255, 255, 255));
 
-    jumper_telemark = SDL_CreateTextureFromSurface(ren, loadTelemark);
+    jumperTelemark = SDL_CreateTextureFromSurface(ren, loadTelemark);
 
         SDL_FreeSurface(loadTelemark);
 
@@ -66,12 +66,12 @@ Jump::Jump(SDL_Renderer* render, Physics* physics, Player* player): ren(render),
 
         SDL_FreeSurface(ladujSurface);
 
-    wind_arrow = IMG_LoadTexture(ren,"img/arrow-wind.png");
-    wind_table = IMG_LoadTexture(ren,"img/wind-table.png");
+    windArrow = IMG_LoadTexture(ren,"img/arrow-wind.png");
+    windTable = IMG_LoadTexture(ren,"img/wind-table.png");
 
     Particle::Style style = Particle::Style::NONE;
     
-    switch (player->get_Weather())
+    switch (player->getWeather())
     {
         case 0: style = Particle::Style::RAIN; break;
         case 1: style = Particle::Style::SUN ; break;
@@ -92,16 +92,16 @@ void Jump::ShowDashboard()
 {
     std::stringstream Vm_ss;
     Vm_ss << physics->getVelocity();
-    Label jumper_velocity_label(Vm_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos, ren);
+    Label jumper_velocity_label(Vm_ss.str().c_str(), dashboardFontSize, dashboardXpos, dashboardYpos, ren);
     jumper_velocity_label.Show();
 
     std::stringstream alfa_ss;
     alfa_ss << alfa;
-    Label jump_angle_label(alfa_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+dashboard_interval, ren);
+    Label jump_angle_label(alfa_ss.str().c_str(), dashboardFontSize, dashboardXpos, dashboardYpos+dashboardInterval, ren);
     jump_angle_label.Show();
 
     std::string weather;
-    switch (player->get_Weather()) // "rain", "sun",  "snow", "wind"
+    switch (player->getWeather()) // "rain", "sun",  "snow", "wind"
     {
         case 0: weather = "rain"; break;
         case 1: weather = "sun"; break;
@@ -109,44 +109,44 @@ void Jump::ShowDashboard()
         case 3: weather = "wind"; break;
     }
 
-    Label weather_label(weather.c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+2*dashboard_interval, ren);
+    Label weather_label(weather.c_str(), dashboardFontSize, dashboardXpos, dashboardYpos+2*dashboardInterval, ren);
     weather_label.Show();
 
     std::stringstream Vw_ss;
     Vw_ss << Vw;
-    Label wind_velocity_label(Vw_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+3*dashboard_interval, ren);
+    Label wind_velocity_label(Vw_ss.str().c_str(), dashboardFontSize, dashboardXpos, dashboardYpos+3*dashboardInterval, ren);
     wind_velocity_label.Show();
 
     std::stringstream Gamma_ss;
-    Gamma_ss << physics->get_GammaW();
-    Label wind_angle_label(Gamma_ss.str().c_str(), dashboard_font_size, dashboard_x_pos, dashboard_y_pos+4*dashboard_interval, ren);
+    Gamma_ss << physics->getGammaW();
+    Label wind_angle_label(Gamma_ss.str().c_str(), dashboardFontSize, dashboardXpos, dashboardYpos+4*dashboardInterval, ren);
     wind_angle_label.Show();
 }
 
 Jump::~Jump()
 {
-    SDL_DestroyTexture(rampa);
-    SDL_DestroyTexture(jumper_na_rampie);
-    SDL_DestroyTexture(jumper_wybicie);
-    SDL_DestroyTexture(jumper_pochylony);
-    SDL_DestroyTexture(jumper_szybuje);
-    SDL_DestroyTexture(jumper_do_ladowania);
-    SDL_DestroyTexture(jumper_telemark);
+    SDL_DestroyTexture(ramp);
+    SDL_DestroyTexture(jumperOnRamp);
+    SDL_DestroyTexture(jumperStartingJump);
+    SDL_DestroyTexture(jumperLeaning);
+    SDL_DestroyTexture(jumperSoars);
+    SDL_DestroyTexture(jumperToLanding);
+    SDL_DestroyTexture(jumperTelemark);
     SDL_FreeSurface(surfaceRamp);
     SDL_DestroyTexture(banner);
-    SDL_DestroyTexture(wind_arrow);
-    SDL_DestroyTexture(wind_table);
+    SDL_DestroyTexture(windArrow);
+    SDL_DestroyTexture(windTable);
 
-    rampa = nullptr;
-    jumper_na_rampie = nullptr;
-    jumper_wybicie = nullptr;
-    jumper_pochylony = nullptr;
-    jumper_szybuje = nullptr;
-    jumper_do_ladowania = nullptr;
-    jumper_telemark = nullptr;
+    ramp = nullptr;
+    jumperOnRamp = nullptr;
+    jumperStartingJump = nullptr;
+    jumperLeaning = nullptr;
+    jumperSoars = nullptr;
+    jumperToLanding = nullptr;
+    jumperTelemark = nullptr;
     banner = nullptr;
-    wind_arrow = nullptr;
-    wind_table = nullptr;
+    windArrow = nullptr;
+    windTable = nullptr;
     surfaceRamp = nullptr;
 
     delete particle;
@@ -155,79 +155,79 @@ Jump::~Jump()
     ren = nullptr;
 };
 
-Fazy_skoku Jump::Czeka()
+JumpPhase Jump::Wait()
 {
-    rect_skoczek = { 88,  85,  38,  38 };
-    rect_wyskok  = { 310, 220,  38, 38 };
+    rectJumper = { 88,  85,  38,  38 };
+    rectStartJump  = { 310, 220,  38, 38 };
 
-    physics->set_Wybicie(false);
+    physics->setJumpStart(false);
 
-    SDL_RenderCopy(ren, rampa, NULL, NULL);
+    SDL_RenderCopy(ren, ramp, NULL, NULL);
 
-    SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(ren, banner, NULL, &rectBanner, 0.0, NULL, SDL_FLIP_NONE);
     ShowDashboard();
 
-    SDL_RenderCopy(ren, jumper_na_rampie, NULL, &rect_skoczek);
+    SDL_RenderCopy(ren, jumperOnRamp, NULL, &rectJumper);
     particle->draw();
-    SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
-    SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(ren, windTable, NULL, &rectWind, 0.0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopyEx(ren, windArrow, NULL, &rectArrow, physics->getGammaW(), NULL, SDL_FLIP_NONE);
 
-    return Fazy_skoku::CZEKA;
+    return JumpPhase::WAIT;
 }
 
-Fazy_skoku Jump::Landing()
+JumpPhase Jump::Landing()
 {
     double angle_skoczek = 0.0;
     double angle_tor     = 0.0;
 
     Uint32 startTime = SDL_GetTicks();
 
-    Fazy_skoku skok = Fazy_skoku::TELEMARK;
+    JumpPhase skok = JumpPhase::TELEMARK;
 
     SDL_Event e;
 
-    while (skok == Fazy_skoku::TELEMARK)
+    while (skok == JumpPhase::TELEMARK)
     {
         frameStart = SDL_GetTicks();
 
-        SDL_RenderCopy(ren, rampa, NULL, NULL);
+        SDL_RenderCopy(ren, ramp, NULL, NULL);
 
-        SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, banner, NULL, &rectBanner, 0.0, NULL, SDL_FLIP_NONE);
         ShowDashboard();
 
-        SDL_RenderCopyEx(ren, jumper_telemark, NULL, &rect_wyskok, angle_skoczek, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, jumperTelemark, NULL, &rectStartJump, angle_skoczek, NULL, SDL_FLIP_NONE);
         particle->draw();
-        SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windTable, NULL, &rectWind, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windArrow, NULL, &rectArrow, physics->getGammaW(), NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(ren);
 
-        rect_wyskok.x += int(physics->Road_Ramp(startTime) * (cos(angle_tor * physics->Deg2Rad)));
-        rect_wyskok.y += int(physics->Road_Ramp(startTime) * (sin(angle_tor * physics->Deg2Rad)));
+        rectStartJump.x += int(physics->roadOnRamp(startTime) * (cos(angle_tor * physics->Deg2Rad)));
+        rectStartJump.y += int(physics->roadOnRamp(startTime) * (sin(angle_tor * physics->Deg2Rad)));
 
-        while (!physics->check_Collision(surfaceRamp, rect_wyskok.x, rect_wyskok.y))
+        while (!physics->checkCollision(surfaceRamp, rectStartJump.x, rectStartJump.y))
         {
-            rect_wyskok.y++;
+            rectStartJump.y++;
         }
 
-        if (rect_wyskok.x > 515)
+        if (rectStartJump.x > 515)
         {
-            angle_skoczek = -35.0f; rect_wyskok.y -= 18;
+            angle_skoczek = -35.0f; rectStartJump.y -= 18;
         }
 
-        if (rect_wyskok.x > 720)
+        if (rectStartJump.x > 720)
         {
-            skok = Fazy_skoku::CZEKA;
+            skok = JumpPhase::WAIT;
         }
 
         while (SDL_PollEvent(&e) != 0)
         {
-            if (e.type == SDL_QUIT) skok = Fazy_skoku::END;
+            if (e.type == SDL_QUIT) skok = JumpPhase::END;
             if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_RETURN:
                     break;
-                case SDLK_ESCAPE: skok = Fazy_skoku::END;
+                case SDLK_ESCAPE: skok = JumpPhase::END;
                     break;
                 }
             }
@@ -241,16 +241,16 @@ Fazy_skoku Jump::Landing()
         }
     }
 
-    return Fazy_skoku::END;
+    return JumpPhase::END;
 };
 
-Fazy_skoku Jump::Wyskok()
+JumpPhase Jump::Flight()
 {
     Uint32 poczatek_skoku = SDL_GetTicks();             // Zaczynamy liczy� czas skoku po wybiciu z rampy 
 
     dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
     alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
-    masa = player->get_Weight();                 // masa skoczka
+    mass = player->getWeight();                 // mass skoczka
     Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
     Cw = 0.0;                                    // wsp�czynnik wiatru  
     Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
@@ -258,7 +258,7 @@ Fazy_skoku Jump::Wyskok()
                                                         // 0 stopni to idea� (RAND -45/+45 stopni)
     Vm = physics->getVelocity();                 // pr�dko�� skoczka na progu !     
 
-    physics->get_Wybicie() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKO�NY, nie to POZIOMY i k�t r�wny 0 !   
+    physics->getJumpStart() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKO�NY, nie to POZIOMY i k�t r�wny 0 !   
                                                         // wz�r jest ten sam, ale istotny jest 'k�t alfa' kt�ry decyduje o odleg�o�ci
     double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wsp�rz�dne x 
     double Vy = Vm * sin(alfa * physics->Deg2Rad);      //    -//-       -//-    y
@@ -270,11 +270,11 @@ Fazy_skoku Jump::Wyskok()
     Uint32 czas_lotu  = 0;
     bool chce_ladowac = false;
 
-    Fazy_skoku skok = Fazy_skoku::SKOK;
+    JumpPhase jump = JumpPhase::JUMP;
 
     SDL_Event e;
 
-    switch (player->get_Weather()) // "rain", "sun",  "snow", "wind"
+    switch (player->getWeather()) // "rain", "sun",  "snow", "wind"
     {
         case 0: Cd = physics->Rain; break;
         case 1: Cd = physics->Sun;  break;
@@ -282,65 +282,65 @@ Fazy_skoku Jump::Wyskok()
         case 3: Cd = physics->Wind; break;
     }
 
-    while (skok == Fazy_skoku::SKOK)
+    while (jump == JumpPhase::JUMP)
     {
         frameStart = SDL_GetTicks();
 
-        SDL_RenderCopy(ren, rampa, NULL, NULL);
+        SDL_RenderCopy(ren, ramp, NULL, NULL);
 
-        SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, banner, NULL, &rectBanner, 0.0, NULL, SDL_FLIP_NONE);
         particle->draw();
         ShowDashboard();
 
-        SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windTable, NULL, &rectWind, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windArrow, NULL, &rectArrow, physics->getGammaW(), NULL, SDL_FLIP_NONE);
 
-        player->get_Wind() ? Vw = physics->rand_Wind(1.0, 4.0) : Vw = 3.0;        
+        player->getWind() ? Vw = physics->randWind(1.0, 4.0) : Vw = 3.0;        
 
         dt = (SDL_GetTicks() - poczatek_skoku) * 0.001;   
 
-        SX = ((masa / Cd) * exp(-(Cd * dt) / masa) * ((-Cw * Vw * cos(physics->get_GammaW() * physics->Deg2Rad)) / Cd - Vx)
-            - (Cw * Vw * cos(physics->get_GammaW() * physics->Deg2Rad) * dt) / Cd)
-            - ((masa / Cd) * ((-Cw * Vw * cos(physics->get_GammaW() * physics->Deg2Rad)) / Cd - Vx)) + Sx1;
+        SX = ((mass / Cd) * exp(-(Cd * dt) / mass) * ((-Cw * Vw * cos(physics->getGammaW() * physics->Deg2Rad)) / Cd - Vx)
+            - (Cw * Vw * cos(physics->getGammaW() * physics->Deg2Rad) * dt) / Cd)
+            - ((mass / Cd) * ((-Cw * Vw * cos(physics->getGammaW() * physics->Deg2Rad)) / Cd - Vx)) + Sx1;
 
-        SY = Sy1 + (-(Vy + (masa * g) / Cd) * (masa / Cd) * exp(-(Cd * dt) / masa)
-            - (masa * g * dt) / Cd) + ((masa / Cd) * (Vy + (masa * g) / Cd));
+        SY = Sy1 + (-(Vy + (mass * g) / Cd) * (mass / Cd) * exp(-(Cd * dt) / mass)
+            - (mass * g * dt) / Cd) + ((mass / Cd) * (Vy + (mass * g) / Cd));
 
-        rect_wyskok.x = int(SX);
-        rect_wyskok.y = int(440 - SY);
+        rectStartJump.x = int(SX);
+        rectStartJump.y = int(440 - SY);
 
-        if (physics->check_Collision(surfaceRamp, rect_wyskok.x, rect_wyskok.y + 6))
+        if (physics->checkCollision(surfaceRamp, rectStartJump.x, rectStartJump.y + 6))
         {
-            skok = Fazy_skoku::TELEMARK;    // skoczek wyladowal
-            int score = (int)sqrt((rect_wyskok.x - 310)*(rect_wyskok.x - 310) + (rect_wyskok.y - 220)*(rect_wyskok.y - 220));
-            player->set_Score(score);
+            jump = JumpPhase::TELEMARK;    // skoczek wyladowal
+            int score = (int)sqrt((rectStartJump.x - 310)*(rectStartJump.x - 310) + (rectStartJump.y - 220)*(rectStartJump.y - 220));
+            player->setScore(score);
         }
 
         if (chce_ladowac)
-            SDL_RenderCopyEx(ren, jumper_do_ladowania, NULL, &rect_wyskok, 0.0, NULL, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(ren, jumperToLanding, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
         else
         {
             czas_lotu = SDL_GetTicks() - poczatek_skoku;
 
             if (czas_lotu < 600)
-                SDL_RenderCopyEx(ren, jumper_wybicie, NULL, &rect_wyskok, 0.0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(ren, jumperStartingJump, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
 
             if (600 < czas_lotu && czas_lotu < 1500)
-                SDL_RenderCopyEx(ren, jumper_pochylony, NULL, &rect_wyskok, 0.0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(ren, jumperLeaning, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
 
             if (czas_lotu >= 1500)
-                SDL_RenderCopyEx(ren, jumper_szybuje, NULL, &rect_wyskok, 0.0, NULL, SDL_FLIP_NONE);
+                SDL_RenderCopyEx(ren, jumperSoars, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
         }
 
         while (SDL_PollEvent(&e) != 0)
         {
-            if (e.type == SDL_QUIT) skok = Fazy_skoku::END;
+            if (e.type == SDL_QUIT) jump = JumpPhase::END;
             if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_RETURN: chce_ladowac = true;
                     break;
-                case SDLK_ESCAPE: skok = Fazy_skoku::END;
+                case SDLK_ESCAPE: jump = JumpPhase::END;
                     break;
                 }
             }
@@ -355,68 +355,68 @@ Fazy_skoku Jump::Wyskok()
             SDL_Delay(frameDelay - frameTime);
         }
     }
-    return skok;
+    return jump;
 }
 
-Fazy_skoku Jump::Zjazd()
+JumpPhase Jump::Slide()
 {
     double angle_skoczek = 30.0;
     double angle_tor     = 0.0;
 
     Uint32 startTime = SDL_GetTicks();
 
-    Fazy_skoku skok  = Fazy_skoku::ZJAZD;
+    JumpPhase skok  = JumpPhase::SLIDE;
 
     SDL_Event e;
 
-    while (skok == Fazy_skoku::ZJAZD)
+    while (skok == JumpPhase::SLIDE)
     {
         frameStart = SDL_GetTicks();
 
-        SDL_RenderCopy(ren, rampa, NULL, NULL);
+        SDL_RenderCopy(ren, ramp, NULL, NULL);
 
-        SDL_RenderCopyEx(ren, banner, NULL, &rect_banner, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, banner, NULL, &rectBanner, 0.0, NULL, SDL_FLIP_NONE);
         ShowDashboard();
 
-        SDL_RenderCopyEx(ren, jumper_na_rampie, NULL, &rect_skoczek, angle_skoczek, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, jumperOnRamp, NULL, &rectJumper, angle_skoczek, NULL, SDL_FLIP_NONE);
         particle->draw();
-        SDL_RenderCopyEx(ren, wind_table, NULL, &rect_wind, 0.0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(ren, wind_arrow, NULL, &rect_arrow, physics->get_GammaW(), NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windTable, NULL, &rectWind, 0.0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(ren, windArrow, NULL, &rectArrow, physics->getGammaW(), NULL, SDL_FLIP_NONE);
         SDL_RenderPresent(ren);
 
-        if (rect_skoczek.x < 130)
+        if (rectJumper.x < 130)
             angle_tor = 44.8f;
         else
             angle_tor = 37.0f;
 
-        if (rect_skoczek.x > 210) 
+        if (rectJumper.x > 210) 
         {
             angle_tor = 26.8f; angle_skoczek = 10.0f;
         }
 
-        if (rect_skoczek.x > 270) { angle_tor = 5.8f; }
+        if (rectJumper.x > 270) { angle_tor = 5.8f; }
 
-        rect_skoczek.x += int(physics->Road_Ramp(startTime) * (cos(angle_tor * physics->Deg2Rad)));
-        rect_skoczek.y += int(physics->Road_Ramp(startTime) * (sin(angle_tor * physics->Deg2Rad)));
+        rectJumper.x += int(physics->roadOnRamp(startTime) * (cos(angle_tor * physics->Deg2Rad)));
+        rectJumper.y += int(physics->roadOnRamp(startTime) * (sin(angle_tor * physics->Deg2Rad)));
 
-        if (rect_skoczek.x > 330)
+        if (rectJumper.x > 330)
         {
-            skok = Fazy_skoku::SKOK;
+            skok = JumpPhase::JUMP;
         }
 
         while (SDL_PollEvent(&e) != 0)
         {
-            if (e.type == SDL_QUIT) skok = Fazy_skoku::END;
+            if (e.type == SDL_QUIT) skok = JumpPhase::END;
             if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_RETURN:
                 {
-                    physics->set_Wybicie((rect_skoczek.x > 300) ? true : false);
+                    physics->setJumpStart((rectJumper.x > 300) ? true : false);
 
-                    skok = Fazy_skoku::SKOK;
+                    skok = JumpPhase::JUMP;
                 } break;
-                case SDLK_ESCAPE: skok = Fazy_skoku::END;
+                case SDLK_ESCAPE: skok = JumpPhase::END;
                     break;
                 }
             }
@@ -432,7 +432,7 @@ Fazy_skoku Jump::Zjazd()
     return skok;
 };
 
-void Jump::set_Render(SDL_Renderer* r)
+void Jump::SetRender(SDL_Renderer* r)
 {
     ren = r;
 };

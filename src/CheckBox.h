@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
-enum class tryby { normal, selected };
+enum class CheckboxMode { normal, selected };
 
 class CheckBox
 {
@@ -15,21 +15,21 @@ public:
     virtual~CheckBox();
 
     void ShowButton();
-    void set_Mode(tryby t);
-    tryby Clicked(SDL_Event& e);
+    void setMode(CheckboxMode t);
+    CheckboxMode Clicked(SDL_Event& e);
 
 private:
     SDL_Renderer* render = NULL;
-    SDL_Surface* loaded_surface = NULL;
+    SDL_Surface* loadedSurface = NULL;
     SDL_Texture* normalImage, * selectedImage, * mTekst;
 
     TTF_Font* pFont;
 
-    SDL_Point mouse_XY;
+    SDL_Point mouseCoords;
 
     SDL_Color textColor = { 34, 123, 255 };
 
-    tryby mode = tryby::normal;
+    CheckboxMode mode = CheckboxMode::normal;
 
     int width = 0, height = 0, posX = 0, posY = 0, fontSize = 0;
 

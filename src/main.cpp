@@ -12,6 +12,7 @@
 #include "Physics.h"
 #include "Jump.h"
 #include "Label.h"
+// #include "SDL2.h"
 
 enum class Status { MENU, START, SCORE, INFO, CONFIG, EXIT };
 
@@ -37,8 +38,8 @@ namespace Global
     Uint32    frameStart;
     int       frameTime;
 }
-    void Loading_Resourses();
-    void Release_Resourses();
+    void LoadingResources();
+    void ReleseResources();
     void Splash();
 
     Status Menu();
@@ -95,7 +96,7 @@ int main(int argc, char* argv[])    // Beginning program
           throw " brak aktywnego systemu AUDIO ...";
         }
 
-        Loading_Resourses();
+        LoadingResources();
 
         Splash();
 
@@ -126,7 +127,7 @@ int main(int argc, char* argv[])    // Beginning program
             }
         }
 
-        Release_Resourses();
+        ReleseResources();
 
     }
     catch (const char* msg)   
@@ -143,17 +144,17 @@ void Splash()   //  pierwszy ekran
 {
     TextureManager::Instance()->Draw("splash", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1, 0, Global::renderer);
 
-    SDL_Surface* app_ico = IMG_Load("img/ski_Icon.jpg");  // Ikona dla aplikacji 
+    SDL_Surface* appIcon = IMG_Load("img/ski_Icon.jpg");  // Ikona dla aplikacji 
     Mix_Music* music = Mix_LoadMUS("mixkit-just-chill-16.wav");
     Mix_PlayMusic(music, 1); // 1 oznacza jedno odtworzenie pliku, -1 infinity
 
-    if (!app_ico)
+    if (!appIcon)
     {
         throw SDL_GetError();
     }
 
-    SDL_SetWindowIcon(Global::window, app_ico);
-    SDL_FreeSurface(app_ico);
+    SDL_SetWindowIcon(Global::window, appIcon);
+    SDL_FreeSurface(appIcon);
     SDL_RenderPresent(Global::renderer);
     SDL_Delay(5000);
     Mix_FreeMusic(music);
@@ -193,13 +194,13 @@ Status Menu() // zarz�dza Menu G��wnym
         buttonExits->Clicked(Global::input);
         buttonExits->ShowButton();
 
-        if (tryb::selected == buttonInfos->Clicked(Global::input))
+        if (Mode::selected == buttonInfos->Clicked(Global::input))
             Global::status = Status::INFO;
-        if (tryb::selected == buttonStart->Clicked(Global::input))
+        if (Mode::selected == buttonStart->Clicked(Global::input))
             Global::status = Status::CONFIG;
-        if (tryb::selected == buttonStore->Clicked(Global::input))
+        if (Mode::selected == buttonStore->Clicked(Global::input))
             Global::status = Status::SCORE;
-        if (tryb::selected == buttonExits->Clicked(Global::input))
+        if (Mode::selected == buttonExits->Clicked(Global::input))
             Global::status = Status::EXIT;
 
         SDL_RenderPresent(Global::renderer);
@@ -226,38 +227,38 @@ Status Start() // Skoki !
 
     Jump jump(Global::renderer, Global::physics, Global::player);
 
-    Fazy_skoku skok = Fazy_skoku::CZEKA;      
+    JumpPhase skok = JumpPhase::WAIT;      
 
     SDL_Event event;
     
     Global::status  = Status::SCORE;
 
-    while (skok != Fazy_skoku::END)
+    while (skok != JumpPhase::END)
     {
         jump.frameStart = SDL_GetTicks();
 
         switch (skok)
         {
-        case Fazy_skoku::CZEKA:    skok = jump.Czeka();
+        case JumpPhase::WAIT:     skok = jump.Wait();
             break;
-        case Fazy_skoku::ZJAZD:    skok = jump.Zjazd();
+        case JumpPhase::SLIDE:    skok = jump.Slide();
             break;
-        case Fazy_skoku::SKOK:     skok = jump.Wyskok();
+        case JumpPhase::JUMP:     skok = jump.Flight();
             break;
-        case Fazy_skoku::TELEMARK: skok = jump.Landing();
+        case JumpPhase::TELEMARK: skok = jump.Landing();
             break;
-        case Fazy_skoku::END:
+        case JumpPhase::END:
             break;
         }
 
         while (SDL_PollEvent(&event) != 0)
         {
-            if (event.type == SDL_QUIT) skok = Fazy_skoku::END;
+            if (event.type == SDL_QUIT) skok = JumpPhase::END;
             if (event.type == SDL_KEYDOWN)
             {
                 switch (event.key.keysym.sym)
                 {
-                case SDLK_RETURN: skok = Fazy_skoku::ZJAZD; break;               
+                case SDLK_RETURN: skok = JumpPhase::SLIDE; break;               
                 }
             }
         }       
@@ -282,14 +283,14 @@ Status Scoreboard() // pokazuje tablic� wynik�w skok�w
     TextureManager::Instance()->Draw("score", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
     Button* buttonScore = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 40, 535, *Global::renderer);
 
-    if(Global::player->get_Name() != "")
+    if(Global::player->getName() != "")
     {
-        Label player_name_label(Global::player->get_Name().c_str(), 24, 410, 250, Global::renderer);
-        player_name_label.Show();
+        Label playerNameLabel(Global::player->getName().c_str(), 24, 410, 250, Global::renderer);
+        playerNameLabel.Show();
 
-        std::string score_str = std::to_string(Global::player->get_Score());
-        Label player_score_label(score_str.c_str(), 24, 620, 250, Global::renderer);
-        player_score_label.Show();
+        std::string scoreStr = std::to_string(Global::player->getScore());
+        Label playerScoreLabel(scoreStr.c_str(), 24, 620, 250, Global::renderer);
+        playerScoreLabel.Show();
     }
 
 
@@ -309,7 +310,7 @@ Status Scoreboard() // pokazuje tablic� wynik�w skok�w
         buttonScore->Clicked(Global::input);
         buttonScore->ShowButton();
 
-        if (tryb::selected == buttonScore->Clicked(Global::input))
+        if (Mode::selected == buttonScore->Clicked(Global::input))
             Global::status = Status::MENU;
 
         SDL_RenderPresent(Global::renderer);
@@ -350,7 +351,7 @@ Status Info() // zarz�dza ekranem INFO
         buttonInfo->Clicked(Global::input);
         buttonInfo->ShowButton();
 
-        if (tryb::selected == buttonInfo->Clicked(Global::input))
+        if (Mode::selected == buttonInfo->Clicked(Global::input))
             Global::status = Status::MENU;
 
         SDL_RenderPresent(Global::renderer);
@@ -376,22 +377,22 @@ Status Config()
     Button* buttonBack  = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 250, 540, *Global::renderer);
     Button* buttonStart = new Button("img/Start_button.png", "img/StartS_button.png", 100, 52, 410, 540, *Global::renderer);
 
-    CheckBox* chb_Small  = new CheckBox("img/s_button.png", "img/sS_button.png", " ", "img/arial.ttf", 36, 0, 40, 224, 366, *Global::renderer);
-    CheckBox* chb_Medium = new CheckBox("img/m_button.png", "img/mS_button.png", " ", "img/arial.ttf", 36, 0, 40, 278, 366, *Global::renderer);
-    CheckBox* chb_Large  = new CheckBox("img/L_button.png", "img/LS_button.png", " ", "img/arial.ttf", 36, 0, 42, 337, 366, *Global::renderer);
-    CheckBox* chb_WindF  = new CheckBox("img/Stable_button.png", "img/FickleS_button.png", "", "img/arial.ttf", 36, 0, 52, 526, 303, *Global::renderer);
+    CheckBox* checkboxSmall  = new CheckBox("img/s_button.png", "img/sS_button.png", " ", "img/arial.ttf", 36, 0, 40, 224, 366, *Global::renderer);
+    CheckBox* checkboxMedium = new CheckBox("img/m_button.png", "img/mS_button.png", " ", "img/arial.ttf", 36, 0, 40, 278, 366, *Global::renderer);
+    CheckBox* checkboxLarge  = new CheckBox("img/L_button.png", "img/LS_button.png", " ", "img/arial.ttf", 36, 0, 42, 337, 366, *Global::renderer);
+    CheckBox* checkboxWindF  = new CheckBox("img/Stable_button.png", "img/FickleS_button.png", "", "img/arial.ttf", 36, 0, 52, 526, 303, *Global::renderer);
 
-    std::string Mapy[3]    = { "skocznia-1", "skocznia-2", "skocznia-3" };
+    std::string Maps[3]    = { "skocznia-1", "skocznia-2", "skocznia-3" };
     std::string Weather[4] = { "rain", "sun",  "snow", "wind" };
 
-    RollBox* roll_Maps = new RollBox(Mapy, 120, 80, 240, 420, 2, Global::renderer);
-    RollBox* roll_Weather = new RollBox(Weather, 120, 80, 535, 365, 3, Global::renderer);
+    RollBox* rollBoxMaps = new RollBox(Maps, 120, 80, 240, 420, 2, Global::renderer);
+    RollBox* rollBoxWeather = new RollBox(Weather, 120, 80, 535, 365, 3, Global::renderer);
 
-    int check_weight = 1;
+    int weightCheck = 1;
 
-    chb_Small->set_Mode(tryby::selected);
+    checkboxSmall->setMode(CheckboxMode::selected);
 
-    std::string  namePlayer ="";
+    std::string  playerName ="";
     SDL_Texture* text;
     SDL_Rect  dest;
     TTF_Font* font;
@@ -418,85 +419,85 @@ Status Config()
                 case SDL_QUIT: Global::status = Status::EXIT;
                     break;
                 case SDL_TEXTINPUT:                
-                    if (namePlayer.size() < Global::NAME_LENGTH)
-                        namePlayer += Global::input.text.text;
-                    Global::player->set_Name(namePlayer);  
+                    if (playerName.size() < Global::NAME_LENGTH)
+                        playerName += Global::input.text.text;
+                    Global::player->setName(playerName);  
                     break;
                 case SDL_KEYDOWN:
-                    if (Global::input.key.keysym.sym == SDLK_BACKSPACE && namePlayer.size())
-                        namePlayer.pop_back();
-                    if (Global::input.key.keysym.sym == SDLK_RETURN && namePlayer.size())
-                        Global::player->set_Name(namePlayer);
+                    if (Global::input.key.keysym.sym == SDLK_BACKSPACE && playerName.size())
+                        playerName.pop_back();
+                    if (Global::input.key.keysym.sym == SDLK_RETURN && playerName.size())
+                        Global::player->setName(playerName);
                     break;
             }
         }
 
-        roll_Maps->Show();
-        roll_Weather->Show();
+        rollBoxMaps->Show();
+        rollBoxWeather->Show();
 
         buttonBack->ShowButton();
         buttonStart->ShowButton();
 
-        chb_Small->ShowButton();
-        chb_Small->Clicked(Global::input);
-        chb_Medium->ShowButton();
-        chb_Medium->Clicked(Global::input);
-        chb_Large->ShowButton();
-        chb_Large->Clicked(Global::input);
+        checkboxSmall->ShowButton();
+        checkboxSmall->Clicked(Global::input);
+        checkboxMedium->ShowButton();
+        checkboxMedium->Clicked(Global::input);
+        checkboxLarge->ShowButton();
+        checkboxLarge->Clicked(Global::input);
 
-        chb_WindF->ShowButton();
-        chb_WindF->Clicked(Global::input);
+        checkboxWindF->ShowButton();
+        checkboxWindF->Clicked(Global::input);
 
-        roll_Maps->Clicked(Global::input);
-        roll_Weather->Clicked(Global::input);
+        rollBoxMaps->Clicked(Global::input);
+        rollBoxWeather->Clicked(Global::input);
 
-        if (tryb::selected == buttonBack->Clicked(Global::input))
+        if (Mode::selected == buttonBack->Clicked(Global::input))
             Global::status = Status::MENU;
-        if (tryb::selected == buttonStart->Clicked(Global::input))
+        if (Mode::selected == buttonStart->Clicked(Global::input))
             Global::status = Status::START;
 
-        if ((chb_Small->Clicked(Global::input) == tryby::selected) && (check_weight == 1)) {
-            check_weight = 0;
+        if ((checkboxSmall->Clicked(Global::input) == CheckboxMode::selected) && (weightCheck == 1)) {
+            weightCheck = 0;
         }
 
-        if (chb_Small->Clicked(Global::input) == tryby::selected && check_weight == 0) {
-            check_weight = 1;
+        if (checkboxSmall->Clicked(Global::input) == CheckboxMode::selected && weightCheck == 0) {
+            weightCheck = 1;
         }
-        else chb_Small->set_Mode(tryby::normal);
+        else checkboxSmall->setMode(CheckboxMode::normal);
 
-        if (chb_Medium->Clicked(Global::input) == tryby::selected && check_weight == 2) {
-            check_weight = 0;
+        if (checkboxMedium->Clicked(Global::input) == CheckboxMode::selected && weightCheck == 2) {
+            weightCheck = 0;
         }
-        if (chb_Medium->Clicked(Global::input) == tryby::selected && check_weight == 0) {
-            check_weight = 2;
+        if (checkboxMedium->Clicked(Global::input) == CheckboxMode::selected && weightCheck == 0) {
+            weightCheck = 2;
         }
-        else chb_Medium->set_Mode(tryby::normal);
+        else checkboxMedium->setMode(CheckboxMode::normal);
 
-        if (chb_Large->Clicked(Global::input) == tryby::selected && check_weight == 3) {
-            check_weight = 0;
+        if (checkboxLarge->Clicked(Global::input) == CheckboxMode::selected && weightCheck == 3) {
+            weightCheck = 0;
         }
-        if (chb_Large->Clicked(Global::input) == tryby::selected && check_weight == 0) {
-            check_weight = 3;
+        if (checkboxLarge->Clicked(Global::input) == CheckboxMode::selected && weightCheck == 0) {
+            weightCheck = 3;
         }
-        else chb_Large->set_Mode(tryby::normal);
+        else checkboxLarge->setMode(CheckboxMode::normal);
 
-        if (namePlayer.size())
+        if (playerName.size())
         {
-            SDL_Surface* text_surf = TTF_RenderText_Blended(font, namePlayer.c_str(), colorText);
+            SDL_Surface* textSurface = TTF_RenderText_Blended(font, playerName.c_str(), colorText);
 
-            text = SDL_CreateTextureFromSurface(Global::renderer, text_surf);
+            text = SDL_CreateTextureFromSurface(Global::renderer, textSurface);
 
             dest.x = 242;
             dest.y = 308;
-            dest.w = text_surf->w;
-            dest.h = text_surf->h;
+            dest.w = textSurface->w;
+            dest.h = textSurface->h;
 
             TextureManager::Instance()->Draw("inputBox", 235, 304, 158, 55, 1.0, 0, Global::renderer);
 
             SDL_RenderCopy(Global::renderer, text, NULL, &dest);
 
             SDL_DestroyTexture(text);
-            SDL_FreeSurface(text_surf);
+            SDL_FreeSurface(textSurface);
         }
 
         SDL_RenderPresent(Global::renderer);
@@ -509,21 +510,21 @@ Status Config()
         }
     }
 
-    if (chb_Small->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(50.0);
-    if (chb_Medium->Clicked(Global::input) == tryby::selected) Global::player->set_Weight(60.0);
-    if (chb_Large->Clicked(Global::input)  == tryby::selected) Global::player->set_Weight(70.0);
+    if (checkboxSmall->Clicked(Global::input)  == CheckboxMode::selected) Global::player->setWeight(50.0);
+    if (checkboxMedium->Clicked(Global::input) == CheckboxMode::selected) Global::player->setWeight(60.0);
+    if (checkboxLarge->Clicked(Global::input)  == CheckboxMode::selected) Global::player->setWeight(70.0);
 
-    if(!Global::player->get_Weight())
-        Global::player->set_Weight(80.0);
+    if(!Global::player->getWeight())
+        Global::player->setWeight(80.0);
 
-    if(Global::player->get_Name().length() < 1)
-        Global::player->set_Name("Anonim");
+    if(Global::player->getName().length() < 1)
+        Global::player->setName("Anonim");
 
-    chb_WindF->Clicked(Global::input) == tryby::selected ? Global::player->set_Wind(1) :        
-                                                           Global::player->set_Wind(0);
+    checkboxWindF->Clicked(Global::input) == CheckboxMode::selected ? Global::player->setWind(1) :        
+                                                           Global::player->setWind(0);
 
-    Global::player->set_Weather(roll_Weather->get_Selected());
-    Global::player->set_Maps(roll_Maps->get_Selected());
+    Global::player->setWeather(rollBoxWeather->GetSelected());
+    Global::player->setMaps(rollBoxMaps->GetSelected());
 
     TTF_CloseFont(font);
 
@@ -532,17 +533,17 @@ Status Config()
     delete buttonBack;
     delete buttonStart;
 
-    delete chb_Small;
-    delete chb_Medium;
-    delete chb_Large;
-    delete chb_WindF;
+    delete checkboxSmall;
+    delete checkboxMedium;
+    delete checkboxLarge;
+    delete checkboxWindF;
 
-    delete roll_Maps;
-    delete roll_Weather;
+    delete rollBoxMaps;
+    delete rollBoxWeather;
 
     return Global::status;
 }
-void Loading_Resourses()  // wczytuje grafik� do Texture Managera, sprawdza obecno�� plik�w ?
+void LoadingResources()  // wczytuje grafik� do Texture Managera, sprawdza obecno�� plik�w ?
 {
     TextureManager::Instance()->Load("img/Splash.png", "splash", Global::renderer);
     TextureManager::Instance()->Load("img/Menu.png", "menu", Global::renderer);
@@ -561,7 +562,7 @@ void Loading_Resourses()  // wczytuje grafik� do Texture Managera, sprawdza ob
     TextureManager::Instance()->Load("img/inputBox.png", "inputBox", Global::renderer);
 }
 
-void Release_Resourses()  // zwalnianie zasob�w 
+void ReleseResources()  // zwalnianie zasob�w 
 {
     delete Global::physics;
     delete Global::player;
@@ -584,7 +585,7 @@ void Release_Resourses()  // zwalnianie zasob�w
 
 Uint32 Callback(Uint32 interval, void* param)
 {
-    Global::physics->set_GammaW(Global::physics->rand_Wind(135.0f, 225.0f)); // (RAND -45/+45 stopni) strza�ka w kierunku na skoczka     
+    Global::physics->setGammaW(Global::physics->randWind(135.0f, 225.0f)); // (RAND -45/+45 stopni) strza�ka w kierunku na skoczka     
 
     return Uint32(interval);
 }

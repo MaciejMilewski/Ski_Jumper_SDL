@@ -22,17 +22,17 @@ CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
     this->selectedImagePath = selectedImagePath;
     this->fontName = fontName;
 
-    loaded_surface = IMG_Load(selectedImagePath);
-    selectedImage = SDL_CreateTextureFromSurface(&render, loaded_surface);
+    loadedSurface = IMG_Load(selectedImagePath);
+    selectedImage = SDL_CreateTextureFromSurface(&render, loadedSurface);
     if (!selectedImage)
         std::cout << " Nie stworzono 'surface' z " << selectedImagePath << ", " << SDL_GetError() << '\n';
-    SDL_FreeSurface(loaded_surface);
+    SDL_FreeSurface(loadedSurface);
 
-    loaded_surface = IMG_Load(normalImagePath);
-    normalImage = SDL_CreateTextureFromSurface(&render, loaded_surface);
+    loadedSurface = IMG_Load(normalImagePath);
+    normalImage = SDL_CreateTextureFromSurface(&render, loadedSurface);
     if (!normalImage)
         std::cout << " Nie stworzono 'surface' z " << normalImagePath << ", " << SDL_GetError() << '\n';
-    SDL_FreeSurface(loaded_surface);
+    SDL_FreeSurface(loadedSurface);
 
     if (width) {
         pFont = TTF_OpenFont(fontName, fontSize);
@@ -64,17 +64,17 @@ CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
     }
 }
 
-tryby CheckBox::Clicked(SDL_Event& e)
+CheckboxMode CheckBox::Clicked(SDL_Event& e)
 {
-    SDL_GetMouseState(&mouse_XY.x, &mouse_XY.y);
+    SDL_GetMouseState(&mouseCoords.x, &mouseCoords.y);
 
     int posXcheck = posX + width + 10;
 
-    bool InOut = ((mouse_XY.x >= posXcheck) && (mouse_XY.x <= (posXcheck + height)) && (mouse_XY.y >= posY) && (mouse_XY.y <= (posY + height))) ? 1 : 0;
+    bool InOut = ((mouseCoords.x >= posXcheck) && (mouseCoords.x <= (posXcheck + height)) && (mouseCoords.y >= posY) && (mouseCoords.y <= (posY + height))) ? 1 : 0;
 
     if (InOut && e.type == SDL_MOUSEBUTTONUP)
     {
-        (mode == tryby::selected) ? mode = tryby::normal : mode = tryby::selected;
+        (mode == CheckboxMode::selected) ? mode = CheckboxMode::normal : mode = CheckboxMode::selected;
     }
     return mode;
 }
@@ -85,7 +85,7 @@ void CheckBox::ShowButton()
     SDL_Rect check = { posX + width + 10, posY, height, height };
 
     switch (mode) {
-    case tryby::normal:
+    case CheckboxMode::normal:
         if (width) {
             SDL_SetRenderDrawColor(render, 0, 123, 0, 255);
             SDL_RenderDrawRect(render, &dest);
@@ -93,7 +93,7 @@ void CheckBox::ShowButton()
         }
         SDL_RenderCopy(render, normalImage, NULL, &check);
         break;
-    case tryby::selected:
+    case CheckboxMode::selected:
         if (width) {
             SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
             SDL_RenderDrawRect(render, &dest);
@@ -104,7 +104,7 @@ void CheckBox::ShowButton()
     }
 }
 
-void CheckBox::set_Mode(tryby t)
+void CheckBox::setMode(CheckboxMode t)
 {
     mode = t;
 }

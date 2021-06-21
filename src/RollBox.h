@@ -27,16 +27,16 @@ public:
     void Show();
 
     void Clicked(SDL_Event& e);
-    int get_Selected();
+    int  GetSelected();
 
 private:
     SDL_Renderer* render = NULL;
     SDL_Texture* texture = NULL;
 
-    SDL_Point mouse_XY{ 0,0 };
+    SDL_Point mouseCoords{ 0,0 };
 
     std::string* t = nullptr;
 
-    int width = 0, height = 0, posX = 0, posY = 0, sizeTab = 0, nr_Pict = 0;
+    int width = 0, height = 0, posX = 0, posY = 0, sizeTab = 0, pictureID = 0;
 };
 

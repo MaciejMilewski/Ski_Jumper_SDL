@@ -8,7 +8,7 @@
 #include "Label.h"
 #include "Particle.h"
 
-enum class Fazy_skoku { CZEKA, ZJAZD, SKOK, TELEMARK, END };
+enum class JumpPhase { WAIT, SLIDE, JUMP, TELEMARK, END };
 
 class Jump   
 {
@@ -17,42 +17,42 @@ public:
     ~Jump();
 
     SDL_Renderer* ren;  
-    SDL_Rect rect_skoczek = { 88,  85,  38,  38 };
-    SDL_Rect rect_wyskok = { 310, 220,  38,  38 };
-    SDL_Rect rect_arrow = { 650,  55,  88,  88 };
-    SDL_Rect rect_wind = { 600,  10, 180, 150 };
-    SDL_Rect rect_banner = { 0, 422, 248, 178 };
+    SDL_Rect rectJumper = { 88,  85,  38,  38 };
+    SDL_Rect rectStartJump = { 310, 220,  38,  38 };
+    SDL_Rect rectArrow = { 650,  55,  88,  88 };
+    SDL_Rect rectWind = { 600,  10, 180, 150 };
+    SDL_Rect rectBanner = { 0, 422, 248, 178 };
 
-    SDL_Texture* rampa = nullptr;
-    SDL_Texture* jumper_na_rampie = nullptr;
-    SDL_Texture* jumper_wybicie = nullptr;
-    SDL_Texture* jumper_pochylony = nullptr;
-    SDL_Texture* jumper_szybuje = nullptr;
-    SDL_Texture* jumper_do_ladowania = nullptr;
-    SDL_Texture* jumper_telemark = nullptr;
+    SDL_Texture* ramp = nullptr;
+    SDL_Texture* jumperOnRamp = nullptr;
+    SDL_Texture* jumperStartingJump = nullptr;
+    SDL_Texture* jumperLeaning  = nullptr;
+    SDL_Texture* jumperSoars = nullptr;
+    SDL_Texture* jumperToLanding = nullptr;
+    SDL_Texture* jumperTelemark = nullptr;
 
     SDL_Texture* banner = nullptr;
-    SDL_Texture* wind_arrow = nullptr;
-    SDL_Texture* wind_table = nullptr;
+    SDL_Texture* windArrow = nullptr;
+    SDL_Texture* windTable = nullptr;
     SDL_Surface* surfaceRamp = nullptr;  
 
-    Fazy_skoku Czeka();
-    Fazy_skoku Wyskok();
-    Fazy_skoku Zjazd();
-    Fazy_skoku Landing();
+    JumpPhase Wait();
+    JumpPhase Flight();
+    JumpPhase Slide();
+    JumpPhase Landing();
 
     void ShowDashboard();
-    void set_Render(SDL_Renderer* r);
+    void SetRender(SDL_Renderer* r);
 
     Physics* physics = nullptr;
     Player*  player  = nullptr;
 
     Particle* particle = new Particle();
 
-    const int dashboard_x_pos = 143;
-    const int dashboard_y_pos = 431;
-    const int dashboard_interval = 35;
-    const int dashboard_font_size = 20;
+    const int dashboardXpos = 143;
+    const int dashboardYpos = 431;
+    const int dashboardInterval = 35;
+    const int dashboardFontSize = 20;
 
     const int FPS = 20;
 
@@ -61,7 +61,7 @@ public:
 
     double dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
     double alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
-    double masa = player->get_Weight();                 // masa skoczka
+    double mass = player->getWeight();                 // masa skoczka
     double Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
     double Cw = 0.0;                                    // wsp�czynnik wiatru  
     double Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)

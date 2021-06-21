@@ -1,50 +1,50 @@
 #include "Player.h"
 
-void Player::set_Name(std::string name)
+void Player::setName(std::string name)
 {
 	m_name = name;
 }
-void Player::set_Weight(double weight)
+void Player::setWeight(double weight)
 {
 	m_weight = weight;
 }
-void Player::set_Maps(int mapa)
+void Player::setMaps(int mapa)
 {
 	m_mapa = mapa;
 }
-void Player::set_Weather(int weather)
+void Player::setWeather(int weather)
 {
 	m_weather = weather;
 }
-void Player::set_Wind(int wind)
+void Player::setWind(int wind)
 {
 	m_wind = wind;
 }
-std::string Player::get_Name() const
+std::string Player::getName() const
 {
 	return m_name;
 }
-void Player::set_Score(int score) 
+void Player::setScore(int score) 
 {
 	m_score = score;
 }
-double Player::get_Weight() const
+double Player::getWeight() const
 {
 	return m_weight;
 }
-int Player::get_Maps() const
+int Player::getMaps() const
 {
 	return m_mapa;
 }
-int Player::get_Weather() const
+int Player::getWeather() const
 {
 	return m_weather;
 }
-int Player::get_Wind() const
+int Player::getWind() const
 {
 	return m_wind;
 }
-int Player::get_Score() const
+int Player::getScore() const
 {
 	return m_score;
 }

@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-enum class tryb { normal, pressed, selected };
+enum class Mode { normal, pressed, selected };
 
 /* tryb wyliczeniowy 'tryb' obrazuje status przycisku Button */
 
@@ -32,15 +32,15 @@ public:
     void SetY(int y);
     int  GetX();
     int  GetY();
-    tryb Clicked(SDL_Event& e);
+    Mode Clicked(SDL_Event& e);
 
 private:
     SDL_Renderer* render = nullptr;
-    SDL_Surface* loaded_surface = nullptr;
+    SDL_Surface* loadedSurface = nullptr;
     SDL_Texture* normalImage, * selectedImage;
     SDL_Point    mouse_XY;
 
-    tryb mode = tryb::normal;
+    Mode mode = Mode::normal;
 
     int width = 0, height = 0, posX = 0, posY = 0;
 
