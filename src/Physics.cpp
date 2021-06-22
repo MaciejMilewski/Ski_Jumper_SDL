@@ -42,9 +42,7 @@ double Physics::roadOnRamp(Uint32 startTime) noexcept
     // S = sinus(alfa) * g * t * t * 0.5 ; WZOR: bez oporu powietrza i tarcia !!!
 
     constexpr double sinus_alfa_30 = 0.50;         // nachylenie skoczni
-
     constexpr double g = 9.81;                     
-
     const Uint32 dt = SDL_GetTicks() - startTime;  
     const double t = dt * 0.001;                   // z milisekund na sekundy
 

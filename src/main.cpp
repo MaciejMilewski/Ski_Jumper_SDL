@@ -534,7 +534,7 @@ Status Config()
 
     return Global::status;
 }
-void LoadingResources()  // wczytuje grafik� do Texture Managera, sprawdza obecno�� plik�w ?
+void LoadingResources()  // wczytuje grafiki do Texture Managera, sprawdza obecnosc plikow 
 {
     TextureManager::Instance()->Load("img/Splash.png", "splash", Global::renderer);
     TextureManager::Instance()->Load("img/Menu.png", "menu", Global::renderer);

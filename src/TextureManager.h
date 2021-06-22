@@ -43,8 +43,8 @@ private:
 
     TextureManager()  {}                                        // zabezpiecza przed stworzeniem nowej instancji
     ~TextureManager() {}                                        // zabezpiecza przed niechciana likwidacja    
-    TextureManager(const TextureManager&);                      // zabezpiecza przed stworzeniem poprzez kopiowanie
-    TextureManager& operator=(const TextureManager&) = delete;  // zabezpiecza przed do��czeniem poprzez =
+    TextureManager(const TextureManager&);                      // zabezpiecza przed kopiowaniem
+    TextureManager& operator=(const TextureManager&) = delete;  // zabezpiecza przed =
 };
 
 typedef TextureManager _TextureManager;

@@ -75,6 +75,7 @@ CheckboxMode CheckBox::Clicked(SDL_Event& e)
     if (InOut && e.type == SDL_MOUSEBUTTONUP)
     {
         (mode == CheckboxMode::selected) ? mode = CheckboxMode::normal : mode = CheckboxMode::selected;
+        SDL_WarpMouseGlobal(760, 650);
     }
     return mode;
 }
