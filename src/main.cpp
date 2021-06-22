@@ -12,7 +12,6 @@
 #include "Physics.h"
 #include "Jump.h"
 #include "Label.h"
-// #include "SDL2.h"
 
 enum class Status { MENU, START, SCORE, INFO, CONFIG, EXIT };
 
@@ -100,7 +99,7 @@ int main(int argc, char* argv[])    // Beginning program
 
         Splash();
 
-        // ------------------------ MAIN LOOP ----------------------- //
+        // ------------------------ GAME LOOP ----------------------- //
 
         while (Global::status != Status::EXIT)
         {
@@ -138,14 +137,14 @@ int main(int argc, char* argv[])    // Beginning program
     return EXIT_SUCCESS;
 }
 
-// -------------------- END MAIN LOOP ----------------------- //
+// -------------------- END GAME LOOP ----------------------- //
 
-void Splash()   //  pierwszy ekran  
+void Splash()   
 {
     TextureManager::Instance()->Draw("splash", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1, 0, Global::renderer);
 
-    SDL_Surface* appIcon = IMG_Load("img/ski_Icon.jpg");  // Ikona dla aplikacji 
-    Mix_Music* music = Mix_LoadMUS("mixkit-just-chill-16.wav");
+    SDL_Surface* appIcon = IMG_Load("img/ski_Icon.jpg");  
+    Mix_Music* music = Mix_LoadMUS("img/mixkit-just-chill-16.wav");
     Mix_PlayMusic(music, 1); // 1 oznacza jedno odtworzenie pliku, -1 infinity
 
     if (!appIcon)
