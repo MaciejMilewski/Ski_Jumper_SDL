@@ -101,7 +101,7 @@ void Jump::ShowDashboard()
     jump_angle_label.Show();
 
     std::string weather;
-    switch (player->getWeather()) // "rain", "sun",  "snow", "wind"
+    switch (player->getWeather()) 
     {
         case 0: weather = "rain"; break;
         case 1: weather = "sun"; break;
@@ -251,8 +251,8 @@ JumpPhase Jump::Flight()
     dt   = 0.0;                                         // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
     alfa = 0.0;                                         // Kat wybicia skoczka
     mass = player->getWeight();                 
-    Cd = 0.0;                                           // wspolczynnik oporu powietrza                                                                                   
-    Cw = 0.0;                                           // wspolczynnik wiatru  
+    Cd = 0.0;                                           // wspolczynnik oporu w powietrzu dla konkretnej pogody                                                                                   
+    Cw = 0.03;                                          // wspolczynnik oporu dla wiatru  
     Vw = 3.0;                                           // v wiatru - STABLE 3 m/s; FICKLE 1-3 m/s 
                                                         // double GammaW = 0.0; kierunek wiatru - kat w stosunku do skoczka
                                                         // 0 stopni to ideal (RAND -45/+45 stopni)
@@ -267,8 +267,8 @@ JumpPhase Jump::Flight()
     Sy1 = 220.0;                                        // punkt wspolrzednej y - miejsce wybicia z rampy skoczni
     SX = 0.0, SY = 0.0;                                 // wspolrzedne x,y po przeliczeniu   
 
-    Uint32 czas_lotu  = 0;
-    bool chce_ladowac = false;
+    Uint32 flightDuration  = 0;
+    bool wantToLand = false;
 
     JumpPhase jump = JumpPhase::JUMP;
 
@@ -316,19 +316,19 @@ JumpPhase Jump::Flight()
             player->setScore(score);
         }
 
-        if (chce_ladowac)
+        if (wantToLand)
             SDL_RenderCopyEx(ren, jumperToLanding, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
         else
         {
-            czas_lotu = SDL_GetTicks() - poczatek_skoku;
+            flightDuration = SDL_GetTicks() - poczatek_skoku;
 
-            if (czas_lotu < 600)
+            if (flightDuration < 600)
                 SDL_RenderCopyEx(ren, jumperStartingJump, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
 
-            if (600 < czas_lotu && czas_lotu < 1500)
+            if (600 < flightDuration && flightDuration < 1500)
                 SDL_RenderCopyEx(ren, jumperLeaning, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
 
-            if (czas_lotu >= 1500)
+            if (flightDuration >= 1500)
                 SDL_RenderCopyEx(ren, jumperSoars, NULL, &rectStartJump, 0.0, NULL, SDL_FLIP_NONE);
         }
 
@@ -338,7 +338,7 @@ JumpPhase Jump::Flight()
             if (e.type == SDL_KEYDOWN) {
                 switch (e.key.keysym.sym)
                 {
-                case SDLK_RETURN: chce_ladowac = true;
+                case SDLK_RETURN: wantToLand = true;
                     break;
                 case SDLK_ESCAPE: jump = JumpPhase::END;
                     break;

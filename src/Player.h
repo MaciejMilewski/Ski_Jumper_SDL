@@ -25,7 +25,7 @@ public:
 private:
 	std::string  m_name;	
 
-	double m_weight;		// S=50, M=60, L-70
+	double m_weight;		// S=50, M=60, L=70
 	int    m_mapa;			
 	int    m_weather;		// slonce, deszcz, snieg, wiatr
 	int	   m_wind;			// wiatr :  stable - 0, fickle - 1,
