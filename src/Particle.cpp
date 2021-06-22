@@ -31,40 +31,37 @@ void Particle::setStyle(Style style)
     case Particle::Style::SUN:
     {
         initWithTotalParticles(350);
-
-        // dzia�anie bez przerwy
         _duration = DURATION_INFINITY;
 
-        // Tryb Grawitacja
+        // Tryb grawitacja - opadanie czastek
         setEmitterMode(Mode::GRAVITY);
-       
         setGravity(Vec2(0, 0));
 
-        // przy�pieszenie
+        // a czastek
         setRadialAccel(0);
         setRadialAccelVar(0);
 
-        // pr�dko�� cz�steczek
+        // v czasteczek
         setSpeed(-20);
         setSpeedVar(5);
 
-        // k�ty
+        // katy
         _angle = 90;
         _angleVar = 360;
 
-        // �ycie cz�steczek
+        // zycie czasteczek
         _life = 1;
         _lifeVar = 0.5f;
 
-        // wielko�� pixeli
+        // wielkosc pixeli
         _startSize = 30.0f;
         _startSizeVar = 10.0f;
         _endSize = START_SIZE_EQUAL_TO_END_SIZE;
 
-        // emisja na sekund�
+        // emisja na sekunde
         _emissionRate = _totalParticles / _life;
 
-        // kolory cz�stek
+        // kolory czastek
         _startColor.r = 0.76f;
         _startColor.g = 0.25f;
         _startColor.b = 0.12f;

@@ -6,18 +6,6 @@
 
 enum class Mode { normal, pressed, selected };
 
-/* tryb wyliczeniowy 'tryb' obrazuje status przycisku Button */
-
-/*  przycisk Button element GUI
-*/
-/* PARAM 'normalImagePath'   - �cie�ka dost�pu zako�czona nazw� pliku do wczytania, 'normalny' przycisk */
-/* PARAM 'selectedImagePath' - �cie�ka dost�pu zako�czona nazw� pliku do wczytania, 'selected' przycisk */
-/* PARAM 'width'  - szeroko�� przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w                 */
-/* PARAM 'heigth' - wysoko�� przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w                  */
-/* PARAM 'posX'   - koordynata X po�o�enia przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w    */
-/* PARAM 'posY'   - koordynata Y po�o�enia przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w    */
-/* PARAM 'render' - wskazuje rendera kt�ry globalnie rysuje wszystko na ekranie                         */
-
 class Button
 {
 public:

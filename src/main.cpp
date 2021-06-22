@@ -23,13 +23,9 @@ namespace Global
 
     SDL_Window* window      = nullptr;
     SDL_Renderer* renderer  = nullptr;
-
     SDL_Event input;  
-
     Status status = Status::MENU;
-
     Player* player = new Player;
-
     Physics* physics = new Physics;
 
     const int FPS = 24;
@@ -50,7 +46,7 @@ namespace Global
     Uint32 Callback(Uint32 interval, void* param);
       void Null();
 
-int main(int argc, char* argv[])    // Beginning program
+int main(int argc, char* argv[])    
 {
     srand(static_cast <unsigned int> (time(0)));
     
@@ -161,7 +157,7 @@ void Splash()
     TextureManager::Instance()->clearFromTextureMap("splash");  
 }
 
-Status Menu() // zarz�dza Menu G��wnym
+Status Menu() 
 {
     TextureManager::Instance()->Draw("menu", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
@@ -220,16 +216,12 @@ Status Menu() // zarz�dza Menu G��wnym
     return Global::status;
 }
 
-Status Start() // Skoki !
+Status Start() 
 {
     SDL_TimerID timerID = SDL_AddTimer(1500, Callback, (void*)Null);
-
     Jump jump(Global::renderer, Global::physics, Global::player);
-
     JumpPhase skok = JumpPhase::WAIT;      
-
     SDL_Event event;
-    
     Global::status  = Status::SCORE;
 
     while (skok != JumpPhase::END)
@@ -277,7 +269,7 @@ Status Start() // Skoki !
     return Global::status;
 }
 
-Status Scoreboard() // pokazuje tablic� wynik�w skok�w
+Status Scoreboard() 
 {
     TextureManager::Instance()->Draw("score", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
     Button* buttonScore = new Button("img/back_button.png", "img/backS_button.png", 100, 52, 40, 535, *Global::renderer);
@@ -327,7 +319,7 @@ Status Scoreboard() // pokazuje tablic� wynik�w skok�w
     return Global::status;
 }
 
-Status Info() // zarz�dza ekranem INFO
+Status Info() 
 {
     TextureManager::Instance()->Draw("info", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1.0, 0, Global::renderer);
 
@@ -561,7 +553,7 @@ void LoadingResources()  // wczytuje grafik� do Texture Managera, sprawdza obe
     TextureManager::Instance()->Load("img/inputBox.png", "inputBox", Global::renderer);
 }
 
-void ReleseResources()  // zwalnianie zasob�w 
+void ReleseResources()  
 {
     delete Global::physics;
     delete Global::player;
@@ -584,7 +576,7 @@ void ReleseResources()  // zwalnianie zasob�w
 
 Uint32 Callback(Uint32 interval, void* param)
 {
-    Global::physics->setGammaW(Global::physics->randWind(135.0f, 225.0f)); // (RAND -45/+45 stopni) strza�ka w kierunku na skoczka     
+    Global::physics->setGammaW(Global::physics->randWind(135.0f, 225.0f)); // (RAND -45/+45 stopni) strzalka w kierunku na skoczka     
 
     return Uint32(interval);
 }

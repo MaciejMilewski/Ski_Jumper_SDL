@@ -38,28 +38,25 @@ double Physics::getVelocity() noexcept
 
 double Physics::roadOnRamp(Uint32 startTime) noexcept
 {
-    // Droga w ruchu jednostajnie przyspieszonym prostoliniowym bez pr�dko�ci pocz�tkowej na skoczni:
-    //    S = sinus(alfa) * g * t * t * 0.5 ; WZ�R: bez oporu powietrza i tarcia !!!
+    // Droga w ruchu jednostajnie przyspieszonym prostoliniowym bez v poczotkowej na skoczni:
+    // S = sinus(alfa) * g * t * t * 0.5 ; WZOR: bez oporu powietrza i tarcia !!!
 
-    constexpr double sinus_alfa_30 = 0.50;         // skocznia pochylona pod k�tem 30 stopni
+    constexpr double sinus_alfa_30 = 0.50;         // nachylenie skoczni
 
-    constexpr double g = 9.81;                     // przy�pieszenie ziemskie
+    constexpr double g = 9.81;                     
 
-    const Uint32 dt = SDL_GetTicks() - startTime;  // up�yw czasu   
+    const Uint32 dt = SDL_GetTicks() - startTime;  
+    const double t = dt * 0.001;                   // z milisekund na sekundy
 
-    const double t = dt * 0.001;                   // przelicznik z milisekund na sekundy
+    velocity = g * t;                              
 
-    velocity = g * t;                              // pr�dko�� na rampie [m/s]    
-
-    return sinus_alfa_30 * g * t * t * 0.5;        // [metry]
+    return sinus_alfa_30 * g * t * t * 0.5;        
 }
 
 bool Physics::checkCollision(SDL_Surface* surface, int x, int y) 
 {
     int bpp = surface->format->BytesPerPixel;
-
     Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
-
     Uint8 red, green, blue, alpha;  // dla 24-bitowego pliku graficznego
 
     SDL_GetRGBA(*p, surface->format, &red, &green, &blue, &alpha);

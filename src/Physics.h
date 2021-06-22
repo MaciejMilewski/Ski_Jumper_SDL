@@ -32,5 +32,5 @@ private:
 
         double gammaW = 0.0;
         double velocity = 0.0;
-        bool   jumpStart = false;    // FALSE to za wczesne wybicie lub jego brak - skok rzut pionowy, TRUE - rzut uko�ny   
+        bool   jumpStart = false;    // FALSE to za wczesne wybicie lub jego brak - skok rzut pionowy, TRUE - rzut ukosny   
 };

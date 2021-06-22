@@ -54,7 +54,7 @@ CheckBox::CheckBox(const char* normalImagePath, const char* selectedImagePath,
                 }
                 else
                 {
-                    width = textSurface ->w; // zapisz rozmiar stworzonego obrazka
+                    width = textSurface ->w; 
                     height = textSurface->h;
                     TTF_CloseFont(pFont);
                 }

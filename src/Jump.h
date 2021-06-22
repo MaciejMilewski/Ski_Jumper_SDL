@@ -59,18 +59,15 @@ public:
     Uint32 frameDelay = Uint32 (1000 / FPS);
     Uint32 frameStart = 0, frameTime = 0;
 
-    double dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
-    double alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
-    double mass = player->getWeight();                 // masa skoczka
-    double Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
-    double Cw = 0.0;                                    // wsp�czynnik wiatru  
-    double Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
-                                                        // double GammaW = 0.0; kierunek wiatru - k�t w stosunku do skoczka
-                                                        // 0 stopni to idea� (RAND -45/+45 stopni)
-    double Vm = 0;                                      // pr�dko�� skoczka na progu !     
-
-    double g  = 9.81;                                   // przy�pieszenie ziemskie  
-    double Sx1 = 310.0;                                 // punkt wsp�rz�dnej x - miejsce wybicia z rampy skoczni 
-    double Sy1 = 220.0;                                 // punkt wsp�rz�dnej y - miejsce wybicia z rampy skoczni
-    double SX = 0.0, SY = 0.0;                          // wsp�rz�dne x,y po przeliczeniu   
+    double dt   = 0.0;                                      
+    double alfa = 0.0;                                 
+    double mass = player->getWeight();                 
+    double Cd = 0.0;                                                                                                                      
+    double Cw = 0.0;                                     
+    double Vw = 3.0;                                                                                                                                           
+    double Vm = 0;                                      
+    double g  = 9.81;                                   
+    double Sx1 = 310.0;                                 
+    double Sy1 = 220.0;                                 
+    double SX = 0.0, SY = 0.0;                            
 };

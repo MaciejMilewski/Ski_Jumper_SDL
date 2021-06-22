@@ -1,19 +1,9 @@
 #pragma once
 
 #include <iostream>
-
 #include <SDL2/SDL.h>
-
 #include "TextureManager.h"
 
-/* przycisk RollBox element GUI                                                                         */
-/* PARAM 'tab[]'  - tablica z nazwami textur kt�re s� w kontenerze map, obrazki kolejno b�d�            */
-/* PARAM            wy�wietlane po naci�ni�ciu przycisku 'przewi�'                                      */
-/* PARAM 'width'  - szeroko�� przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w                 */
-/* PARAM 'heigth' - wysoko�� przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w                  */
-/* PARAM 'posX'   - koordynata X po�o�enia przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w    */
-/* PARAM 'posY'   - koordynata Y po�o�enia przycisku na ekranie, wsp�lna dla obu wczytanych obrazk�w    */
-/* PARAM 'render' - wskazuje rendera kt�ry globalnie rysuje wszystko na ekranie                         */
 
 class RollBox
 {

@@ -246,26 +246,26 @@ JumpPhase Jump::Landing()
 
 JumpPhase Jump::Flight()
 {
-    Uint32 poczatek_skoku = SDL_GetTicks();             // Zaczynamy liczy� czas skoku po wybiciu z rampy 
+    Uint32 poczatek_skoku = SDL_GetTicks();             // czas po wybiciu z rampy 
 
-    dt   = 0.0;                                  // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
-    alfa = 0.0;                                  // brak wybicia skoczka w g�r�, czyli k�t 0 stopni
-    mass = player->getWeight();                 // mass skoczka
-    Cd = 0.0;                                    // wsp�czynnik oporu powietrza                                                                                   
-    Cw = 0.0;                                    // wsp�czynnik wiatru  
-    Vw = 3.0;                                    // pr�dko�� wiatru - STABLE 3 m/s; FICKLE 1-3 m/s (losowa funkcja 1-4 m/s)
-                                                        // double GammaW = 0.0; kierunek wiatru - k�t w stosunku do skoczka
-                                                        // 0 stopni to idea� (RAND -45/+45 stopni)
-    Vm = physics->getVelocity();                 // pr�dko�� skoczka na progu !     
+    dt   = 0.0;                                         // czas skoku w powietrzu dt = aktualny_czas - poczatek-skoku     
+    alfa = 0.0;                                         // Kat wybicia skoczka
+    mass = player->getWeight();                 
+    Cd = 0.0;                                           // wspolczynnik oporu powietrza                                                                                   
+    Cw = 0.0;                                           // wspolczynnik wiatru  
+    Vw = 3.0;                                           // v wiatru - STABLE 3 m/s; FICKLE 1-3 m/s 
+                                                        // double GammaW = 0.0; kierunek wiatru - kat w stosunku do skoczka
+                                                        // 0 stopni to ideal (RAND -45/+45 stopni)
+    Vm = physics->getVelocity();                        // v skoczka na progu      
 
-    physics->getJumpStart() ? alfa = 30.0 : alfa = 0.0;  // Gdy wybicie z progu - to RZUT UKO�NY, nie to POZIOMY i k�t r�wny 0 !   
-                                                        // wz�r jest ten sam, ale istotny jest 'k�t alfa' kt�ry decyduje o odleg�o�ci
-    double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wsp�rz�dne x 
-    double Vy = Vm * sin(alfa * physics->Deg2Rad);      //    -//-       -//-    y
-    g  = 9.81;                                   // przy�pieszenie ziemskie  
-    Sx1 = 310.0;                                 // punkt wsp�rz�dnej x - miejsce wybicia z rampy skoczni 
-    Sy1 = 220.0;                                 // punkt wsp�rz�dnej y - miejsce wybicia z rampy skoczni
-    SX = 0.0, SY = 0.0;                          // wsp�rz�dne x,y po przeliczeniu   
+    physics->getJumpStart() ? alfa = 30.0 : alfa = 0.0; // Skok bez wybicia to 0 stopni(rzut poziomy), jezeli sie wybije to 30 stopni(rzut ukosny)   
+                                                        // wzor jest ten sam, ale istotny jest 'kat alfa' ktory decyduje o odleglosci
+    double Vx = Vm * cos(alfa * physics->Deg2Rad);      // obliczone wspolrzedne x 
+    double Vy = Vm * sin(alfa * physics->Deg2Rad);      // obliczone wspolrzedne y
+    g  = 9.81;                                          // przyspieszenie ziemskie  
+    Sx1 = 310.0;                                        // punkt wspolrzednej x - miejsce wybicia z rampy skoczni 
+    Sy1 = 220.0;                                        // punkt wspolrzednej y - miejsce wybicia z rampy skoczni
+    SX = 0.0, SY = 0.0;                                 // wspolrzedne x,y po przeliczeniu   
 
     Uint32 czas_lotu  = 0;
     bool chce_ladowac = false;
@@ -274,7 +274,7 @@ JumpPhase Jump::Flight()
 
     SDL_Event e;
 
-    switch (player->getWeather()) // "rain", "sun",  "snow", "wind"
+    switch (player->getWeather()) 
     {
         case 0: Cd = physics->Rain; break;
         case 1: Cd = physics->Sun;  break;
@@ -311,7 +311,7 @@ JumpPhase Jump::Flight()
 
         if (physics->checkCollision(surfaceRamp, rectStartJump.x, rectStartJump.y + 6))
         {
-            jump = JumpPhase::TELEMARK;    // skoczek wyladowal
+            jump = JumpPhase::TELEMARK;    
             int score = (int)sqrt((rectStartJump.x - 310)*(rectStartJump.x - 310) + (rectStartJump.y - 220)*(rectStartJump.y - 220));
             player->setScore(score);
         }

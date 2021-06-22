@@ -42,7 +42,7 @@ private:
     static TextureManager* pInstance;
 
     TextureManager()  {}                                        // zabezpiecza przed stworzeniem nowej instancji
-    ~TextureManager() {}                                        // zabezpiecza przed niechcian� likwidacj�    
+    ~TextureManager() {}                                        // zabezpiecza przed niechciana likwidacja    
     TextureManager(const TextureManager&);                      // zabezpiecza przed stworzeniem poprzez kopiowanie
     TextureManager& operator=(const TextureManager&) = delete;  // zabezpiecza przed do��czeniem poprzez =
 };
