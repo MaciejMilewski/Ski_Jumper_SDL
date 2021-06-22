@@ -25,7 +25,7 @@ The main purpose of project is to create ski jumping game similar to [Ski Jumper
 
 ## Installation
 ##
-> Note: Yomu must install all mentioned libraries on your OS to run game.
+> Note: You must install all mentioned libraries on your OS to run game.
 > Recommended setup of enviroment on Ubuntu [https://www.paulbarrick.com](https://www.paulbarrick.com/game-devlopment/game-development-on-linux-using-vscode-sdl2-and-opengl/) 
 ##
 ```
