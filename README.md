@@ -1,5 +1,5 @@
 # Ski jumper game in SDL2
-The main purpose of project is to create ski jumping game similar to [Ski Jumper Deluxe 2](https://https://www.youtube.com/watch?v=X-pL9knbOj4) using C++ and SDL2 library.
+The main purpose of project is to create ski jumping game similar to [Ski Jumper Deluxe 2](https://www.youtube.com/watch?v=X-pL9knbOj4) using C++ and SDL2 library.
 
 ## Loading screen
 ![alt text](img/splash.png?raw=true "")
