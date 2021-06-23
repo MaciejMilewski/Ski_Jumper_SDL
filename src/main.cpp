@@ -92,7 +92,6 @@ int main(int argc, char* argv[])
         }
 
         LoadingResources();
-
         Splash();
 
         // ------------------------ GAME LOOP ----------------------- //
@@ -140,13 +139,13 @@ void Splash()
     TextureManager::Instance()->Draw("splash", 0, 0, Global::SCREEN_WIDTH, Global::SCREEN_HEIGHT, 1, 0, Global::renderer);
 
     SDL_Surface* appIcon = IMG_Load("img/ski_Icon.jpg");  
-    Mix_Music* music = Mix_LoadMUS("img/mixkit-just-chill-16.wav");
-    Mix_PlayMusic(music, 1); // 1 oznacza jedno odtworzenie pliku, -1 infinity
-
     if (!appIcon)
     {
         throw SDL_GetError();
     }
+
+    Mix_Music* music = Mix_LoadMUS("img/mixkit-just-chill-16.wav");
+    Mix_PlayMusic(music, 1); // 1 oznacza jedno odtworzenie pliku, -1 infinity
 
     SDL_SetWindowIcon(Global::window, appIcon);
     SDL_FreeSurface(appIcon);
@@ -224,6 +223,7 @@ Status Start()
     SDL_Event event;
     Global::status  = Status::SCORE;
 
+    /* SKI JUMP LOOP */
     while (skok != JumpPhase::END)
     {
         jump.frameStart = SDL_GetTicks();
@@ -262,7 +262,8 @@ Status Start()
         {
             SDL_Delay(jump.frameDelay - jump.frameTime);
         }
-    }    
+    }
+    /* SKI JUMP LOOP END */    
 
     SDL_RemoveTimer(timerID);    
 

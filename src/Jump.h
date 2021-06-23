@@ -59,6 +59,7 @@ public:
     Uint32 frameDelay = Uint32 (1000 / FPS);
     Uint32 frameStart = 0, frameTime = 0;
 
+    const int takeOffThreshold = 300; 
     double dt   = 0.0;                                      
     double alfa = 0.0;                                 
     double mass = player->getWeight();                 

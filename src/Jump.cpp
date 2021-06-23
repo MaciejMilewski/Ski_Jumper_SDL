@@ -412,7 +412,7 @@ JumpPhase Jump::Slide()
                 {
                 case SDLK_RETURN:
                 {
-                    physics->setJumpStart((rectJumper.x > 300) ? true : false);
+                    physics->setJumpStart((rectJumper.x > takeOffThreshold) ? true : false);
 
                     skok = JumpPhase::JUMP;
                 } break;
